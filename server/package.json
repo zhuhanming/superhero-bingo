@@ -58,7 +58,7 @@
     "clean": "tsc --build --clean"
   },
   "lint-staged": {
-    "**/*.{ts,js}": [
+    "**/*.{ts}": [
       "pretty-quick --staged",
       "eslint --fix"
     ]
