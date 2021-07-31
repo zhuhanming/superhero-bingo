@@ -1,0 +1,33 @@
+{
+  "private": "true",
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "client": "yarn workspace client",
+    "server": "yarn workspace server",
+    "shared": "yarn workspace shared",
+    "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || is-ci || husky install",
+    "setup-db": "test -e scripts/db/setup_db_local.sh && ./scripts/db/setup_db_local.sh || ./scripts/db/setup_db.sh",
+    "migrate": "yarn server migrate",
+    "seed": "yarn server seed",
+    "codegen": "ts-node scripts/codegen/index.ts",
+    "test": "npm-run-all test:*",
+    "test:client": "yarn client test",
+    "test:server": "yarn server test",
+    "test:shared": "yarn shared test",
+    "lint": "npm-run-all lint:*",
+    "lint:client": "yarn client lint",
+    "lint:server": "yarn server lint",
+    "lint:shared": "yarn shared lint"
+  },
+  "devDependencies": {
+    "@types/node": "^16.4.8",
+    "husky": "^7.0.1",
+    "npm-run-all": "^4.1.5",
+    "ts-node": "^10.1.0",
+    "typescript": "^4.3.5"
+  }
+}
