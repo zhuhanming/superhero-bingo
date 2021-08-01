@@ -13,7 +13,8 @@
     "helmet": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "socket.io": "^4.1.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
