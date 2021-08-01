@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@craco/craco": "^6.2.0",
     "@reduxjs/toolkit": "^1.6.1",
     "react": "^17.0.2",
     "react-async": "^10.0.1",
@@ -23,6 +24,7 @@
     "@types/webpack-env": "^1.16.2",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.5",
+    "autoprefixer": "^9",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-prettier": "^8.3.0",
@@ -34,14 +36,16 @@
     "eslint-plugin-simple-import-sort": "^7.0.0",
     "husky": "^7.0.1",
     "lint-staged": "^11.1.1",
+    "postcss": "^7",
     "prettier": "^2.3.2",
     "pretty-quick": "^3.1.1",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat",
     "typescript": "^4.3.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
     "eject": "react-scripts eject",
     "lint": "eslint . --fix --ext .js,.jsx,.ts,.tsx && prettier --write \"src/**/*.{ts,tsx}\" --tab-width 2",
     "lint_ci": "eslint . --ext .js,.jsx,.ts,.tsx && prettier --check \"src/**/*.{ts,tsx}\" --tab-width 2"
