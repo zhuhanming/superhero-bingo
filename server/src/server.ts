@@ -42,6 +42,7 @@ export class ApiServer {
   }
 
   async close(): Promise<void> {
+    console.log('\nShutting down...');
     this.server && this.server.close();
     this.io && this.io.close();
   }
