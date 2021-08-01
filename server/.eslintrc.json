@@ -18,6 +18,7 @@
       }
     ],
     "@typescript-eslint/no-explicit-any": ["off"],
+    "@typescript-eslint/no-non-null-assertion": ["off"],
     "linebreak-style": ["error", "unix"],
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
@@ -28,7 +29,7 @@
           // Packages packages come first.
           ["^@?\\w"],
           // Internal packages.
-          ["^(controllers|lib|routes)(/.*|$)"],
+          ["^(controllers|lib|routes|socket|utils)(/.*|$)"],
           // Side effect imports.
           ["^\\u0000"],
           // Parent imports. Put `..` last.
