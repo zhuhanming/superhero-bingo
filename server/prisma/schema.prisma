@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["referentialActions"]
+}
+
+// The game board itself
+model Bingo {
+  id          Int          @id @default(autoincrement())
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  name        String // Cannot be updated while a game is ongoing
+  ownerCode   String       @unique // Naive implementation of ownership
+  superpowers Superpower[] // Cannot be updated while a game is ongoing
+  games       Game[]
+}
+
+model Game {
+  id        Int         @id @default(autoincrement())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  joinCode  String      @unique // For now, we don't foresee there being collisions
+  bingo     Bingo       @relation(fields: [bingoId], references: [id], onDelete: Cascade)
+  bingoId   Int
+  isOngoing Boolean     @default(true)
+  heroes    Superhero[]
+}
+
+model Superpower {
+  id                      Int                       @id @default(autoincrement())
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  description             String
+  order                   Int // Sorted powers, 0-based indexing
+  bingo                   Bingo                     @relation(fields: [bingoId], references: [id], onDelete: Cascade)
+  bingoId                 Int
+  HeroPowerPairing        HeroPowerPairing[]
+  HeroPowerPairingInvites HeroPowerPairingInvites[]
+
+  // We won't allow duplicated superpowers for the same bingo
+  @@unique([description, bingoId])
+}
+
+model Superhero {
+  id         Int                       @id @default(autoincrement())
+  createdAt  DateTime                  @default(now())
+  updatedAt  DateTime                  @updatedAt
+  name       String
+  game       Game                      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId     Int
+  pairings   HeroPowerPairing[]        @relation("owner") // Powers on their board
+  signatures HeroPowerPairing[]        @relation("signee") // Powers they signed
+  invites    HeroPowerPairingInvites[] // Invites created for signees
+
+  // To prevent duplication of names in a single game
+  @@unique([name, gameId])
+}
+
+// Powers on each superhero's board
+model HeroPowerPairing {
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  owner        Superhero  @relation("owner", fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId      Int
+  superpower   Superpower @relation(fields: [superpowerId], references: [id], onDelete: Cascade)
+  superpowerId Int
+  signee       Superhero  @relation("signee", fields: [signeeId], references: [id], onDelete: Cascade)
+  signeeId     Int
+
+  // Can only sign once for each person
+  @@unique([ownerId, signeeId])
+}
+
+model HeroPowerPairingInvites {
+  id           Int        @id @default(autoincrement())
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  inviteCode   String     @unique // Invite will be deleted once signed, so chance of collision is low
+  owner        Superhero  @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId      Int
+  superpower   Superpower @relation(fields: [superpowerId], references: [id], onDelete: Cascade)
+  superpowerId Int
+
+  // One invitation per superpower at any time
+  @@unique([ownerId, superpowerId])
+}
