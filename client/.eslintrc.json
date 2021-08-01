@@ -48,7 +48,6 @@
     "import/imports-first": ["error", "absolute-first"],
     "import/newline-after-import": "error",
     "import/no-unresolved": "off",
-    "import/no-extraneous-dependencies": "off",
     "import/prefer-default-export": "off",
     "no-underscore-dangle": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
