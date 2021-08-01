@@ -1,7 +1,7 @@
 import cors, { CorsOptions } from 'cors';
 import express, { RequestHandler } from 'express';
 import helmet from 'helmet';
-import { Server } from 'http';
+import { createServer, Server } from 'http';
 import morgan from 'morgan';
 import { Server as SocketServer } from 'socket.io';
 
@@ -32,9 +32,18 @@ export class ApiServer {
     }
     app.use(routes);
 
-    const server = app.listen(port);
+    const server = createServer(app);
     server.timeout = 1200000;
-    const io = new SocketServer(server);
+    const io = new SocketServer(server, {
+      cors: {
+        origin:
+          process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '',
+        methods: ['GET', 'POST'],
+        credentials: true,
+      },
+      allowEIO3: true,
+    });
+    server.listen(port);
     setUpIo(io);
 
     this.server = server;
