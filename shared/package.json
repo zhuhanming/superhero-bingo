@@ -25,6 +25,7 @@
     "test": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --forceExit --passWithNoTests",
     "test:ci": "jest --verbose --forceExit --runInBand --passWithNoTests",
     "lint": "eslint . --fix --ext .ts && prettier --write \"src/**/*.{ts,tsx}\" --tab-width 2",
-    "lint_ci": "eslint . --ext .ts && prettier --check \"src/**/*.{ts,tsx}\" --tab-width 2"
+    "lint_ci": "eslint . --ext .ts && prettier --check \"src/**/*.{ts,tsx}\" --tab-width 2",
+    "build:watch": "tsc -w"
   }
 }
