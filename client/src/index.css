@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.font-regular {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+}
+
+.font-light {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
+
+.font-medium {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+.font-bold {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 900;
+}
