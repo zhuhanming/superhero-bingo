@@ -21,6 +21,9 @@ module.exports = {
       white: {
         DEFAULT: '#ffffff',
       },
+      gray: {
+        DEFAULT: '#E5E7EB',
+      },
     },
     borderWidth: {
       DEFAULT: '1px',

@@ -5,17 +5,26 @@ type ErrorMessages = {
   fetchBingoError: string;
 };
 
+type LoadingState = {
+  isFetching: boolean;
+  isSaving: boolean;
+};
+
 export interface MiscDux {
   errors: ErrorMessages;
+  loading: LoadingState;
 }
 
 const initialState: MiscDux = {
   errors: {
     fetchBingoError: '',
   },
+  loading: {
+    isFetching: false,
+    isSaving: false,
+  },
 };
 
-// Contains user information, theme, view selected and fun fact of the day
 const misc = createSlice({
   name: 'misc',
   initialState,
@@ -26,9 +35,15 @@ const misc = createSlice({
     ): void => {
       state.errors = { ...state.errors, ...action.payload };
     },
+    updateLoadingState: (
+      state,
+      action: PayloadAction<Partial<LoadingState>>
+    ): void => {
+      state.loading = { ...state.loading, ...action.payload };
+    },
   },
 });
 
-export const { updateErrorMessages } = misc.actions;
+export const { updateErrorMessages, updateLoadingState } = misc.actions;
 
 export default misc.reducer;

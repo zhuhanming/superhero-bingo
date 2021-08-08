@@ -3,11 +3,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
 import BingoButton from 'components/bingoButton';
+import BingoInput from 'components/bingoInput';
 import Navbar from 'components/navbar';
 import { EDIT } from 'constants/routes';
 import { useSocket } from 'contexts/SocketContext';
 import { clearBingo } from 'reducers/bingoDux';
-import { updateErrorMessages } from 'reducers/miscDux';
+import { updateErrorMessages, updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
 import { fetchBingo } from 'services/socketRequestService';
 
@@ -18,32 +19,30 @@ const Start: React.FC = () => {
     (state: RootState) => state.misc.errors.fetchBingoError
   );
   const bingoId = useSelector((state: RootState) => state.bingo.bingo.id);
+  const [previousBingoId, setPreviousBingoId] = useState(bingoId);
+  const isFetching = useSelector(
+    (state: RootState) => state.misc.loading.isFetching
+  );
   const { socket } = useSocket();
-
-  const [isLoading, setIsLoading] = useState(false);
   const [code, setCode] = useState('');
 
   useEffect(() => {
-    if (fetchErrorMessage.length > 0) {
-      setIsLoading(false);
-    }
-  }, [fetchErrorMessage]);
-
-  useEffect(() => {
-    if (bingoId !== -1) {
+    if (bingoId !== -1 && bingoId !== previousBingoId) {
       history.push(EDIT);
     }
   }, [bingoId]);
 
   const onClickCreate = async () => {
-    if (isLoading) return;
+    if (isFetching) return;
+    dispatch(clearBingo());
+    setPreviousBingoId(-1);
     history.push(EDIT);
   };
 
   const onClickUpdate = async () => {
-    if (isLoading || code.length < 6) return;
+    if (isFetching || code.length < 6) return;
     dispatch(updateErrorMessages({ fetchBingoError: '' }));
-    setIsLoading(true);
+    dispatch(updateLoadingState({ isFetching: true }));
     fetchBingo(socket, code);
   };
 
@@ -71,22 +70,22 @@ const Start: React.FC = () => {
         </h1>
         <BingoButton
           text="Create New Collection"
-          isDisabled={isLoading}
+          isDisabled={isFetching}
           onClick={onClickCreate}
           className="md:max-w-2xl p-4 bg-blue border-black border-8"
         />
         <h1 className="font-bold text-lg my-8">- OR -</h1>
-        <input
-          className="w-full md:max-w-2xl rounded-xl p-4 text-2xl text-center font-medium mb-8"
+        <BingoInput
+          className="md:max-w-2xl p-4 text-2xl text-center mb-8"
           placeholder="A1B24C6"
           value={code}
-          onChange={(e) => onUpdateCode(e.target.value)}
-          disabled={isLoading}
+          onChange={onUpdateCode}
+          isDisabled={isFetching}
         />
         <BingoButton
-          text={isLoading ? 'Loading...' : 'Edit Existing Collection'}
+          text="Edit Existing Collection"
           isDisabled={code.length < 6}
-          isLoading={isLoading}
+          isLoading={isFetching}
           onClick={onClickUpdate}
           className="md:max-w-2xl p-4 bg-blue border-black border-8"
         />

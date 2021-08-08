@@ -1,6 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { CreatedBingo, UpdatedBingo, UpdatedSuperpower } from 'shared';
+import { v4 as uuidv4 } from 'uuid';
 
 import { sortByOrder } from 'utils/sortUtils';
 
@@ -52,7 +53,7 @@ const bingo = createSlice({
       }
       const superpowersCopy = state.bingo.superpowers.slice();
       superpowersCopy.push({
-        uniqueId: `superpower-${newOrder}`,
+        uniqueId: uuidv4(),
         description: '',
         order: newOrder,
       });
@@ -60,14 +61,22 @@ const bingo = createSlice({
     },
     updateBingoSuperpower: (
       state,
-      action: PayloadAction<{ index: number; description: string }>
+      action: PayloadAction<{
+        index: number;
+        description: string;
+        uniqueId?: string;
+      }>
     ): void => {
-      const { index, description } = action.payload;
+      const { index, description, uniqueId } = action.payload;
       if (index < 0 || index >= state.bingo.superpowers.length) {
         return;
       }
       const superpowersCopy = state.bingo.superpowers.slice().sort(sortByOrder);
-      superpowersCopy[index] = { ...superpowersCopy[index], description };
+      superpowersCopy[index] = {
+        ...superpowersCopy[index],
+        description,
+        uniqueId: uniqueId ?? superpowersCopy[index].uniqueId,
+      };
       state.bingo.superpowers = superpowersCopy;
     },
     deleteBingoSuperpower: (state, action: PayloadAction<number>): void => {

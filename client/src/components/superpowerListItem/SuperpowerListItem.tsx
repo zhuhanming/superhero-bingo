@@ -1,6 +1,7 @@
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 
+import BingoInput from 'components/bingoInput';
 import DragHandle from 'components/dragHandle';
 import TrashIcon from 'components/trashIcon';
 import { MAX_DESCRIPTION_LENGTH } from 'constants/bingo';
@@ -43,11 +44,11 @@ const SuperpowerListItem: React.FC<Props> = ({
             className="text-md mr-2 cursor-move"
           />
           <div className="flex-1" style={{ marginBottom: -16 }}>
-            <input
-              className="w-full rounded-xl p-2 text-lg font-medium mb-1"
+            <BingoInput
+              className="p-2 text-lg mb-1"
               placeholder="Enter a superpower"
               value={description}
-              onChange={(event) => onChangeDescription(event.target.value)}
+              onChange={onChangeDescription}
             />
             <div className="flex justify-end text-xs">
               {description.length} / {MAX_DESCRIPTION_LENGTH}
