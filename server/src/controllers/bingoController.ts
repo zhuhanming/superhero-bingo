@@ -13,7 +13,10 @@ export const createBingo = async (bingoData: Bingo): Promise<CreatedBingo> => {
       name: bingoData.name,
       ownerCode,
       superpowers: {
-        create: bingoData.superpowers,
+        create: bingoData.superpowers.map((s) => ({
+          description: s.description,
+          order: s.order,
+        })),
       },
     },
     include: {
@@ -64,7 +67,12 @@ export const updateBingo = async (
     data: {
       name: bingoData.name,
       superpowers: {
-        create: bingoData.superpowers.filter((s) => s.id == null),
+        create: bingoData.superpowers
+          .filter((s) => s.id == null)
+          .map((s) => ({
+            description: s.description,
+            order: s.order,
+          })),
       },
     },
     include: {

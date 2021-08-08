@@ -1,0 +1,34 @@
+import {
+  CreatedBingo,
+  RES_CREATE_BINGO,
+  RES_FETCH_BINGO,
+  RES_UPDATE_BINGO,
+} from 'shared';
+import { Socket } from 'socket.io-client';
+
+import store from 'app/store';
+import { setBingo } from 'reducers/bingoDux';
+
+const receivedBingo = (socket: Socket): void => {
+  socket.on(RES_FETCH_BINGO, (payload: CreatedBingo) => {
+    store.dispatch(setBingo(payload));
+  });
+};
+
+const createdBingo = (socket: Socket): void => {
+  socket.on(RES_CREATE_BINGO, (payload: CreatedBingo) => {
+    store.dispatch(setBingo(payload));
+  });
+};
+
+const updatedBingo = (socket: Socket): void => {
+  socket.on(RES_UPDATE_BINGO, (payload: CreatedBingo) => {
+    store.dispatch(setBingo(payload));
+  });
+};
+
+export const initalizeSocket = (socket: Socket): void => {
+  receivedBingo(socket);
+  createdBingo(socket);
+  updatedBingo(socket);
+};

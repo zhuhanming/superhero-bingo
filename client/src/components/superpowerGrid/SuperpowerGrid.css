@@ -1,0 +1,6 @@
+.superpower-grid-cell::before {
+  content: '';
+  display: inline-block;
+  padding-bottom: 100%;
+  vertical-align: top;
+}

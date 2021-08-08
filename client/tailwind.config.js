@@ -10,10 +10,16 @@ module.exports = {
         DEFAULT: '#f8d347',
       },
       black: {
-        DEFAULT: '#414141',
+        DEFAULT: '#231f20',
       },
       blue: {
         DEFAULT: '#6fcbf7',
+      },
+      green: {
+        DEFAULT: '#34D399',
+      },
+      white: {
+        DEFAULT: '#ffffff',
       },
     },
     borderWidth: {

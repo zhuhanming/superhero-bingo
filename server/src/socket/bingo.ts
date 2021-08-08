@@ -18,6 +18,8 @@ export const socketCreateBingo = (
   socket: Socket
 ): CreateBingoFunction => {
   return async (bingoData: Bingo): Promise<void> => {
+    console.log('REQ_CREATE_BINGO');
+    console.log('Bingo data received: ', bingoData);
     const bingo = await BingoController.createBingo(bingoData);
     socket.emit(RES_CREATE_BINGO, bingo);
   };
@@ -28,6 +30,8 @@ export const socketUpdateBingo = (
   socket: Socket
 ): UpdateBingoFunction => {
   return async (bingoData: CreatedBingo): Promise<void> => {
+    console.log('REQ_UPDATE_BINGO');
+    console.log('Bingo data received: ', bingoData);
     const bingo = await BingoController.updateBingo(bingoData);
     socket.emit(RES_UPDATE_BINGO, bingo);
   };
@@ -38,6 +42,8 @@ export const socketFetchBingo = (
   socket: Socket
 ): FetchBingoFunction => {
   return async (ownerCode: string): Promise<void> => {
+    console.log('REQ_FETCH_BINGO');
+    console.log('Owner code received: ', ownerCode);
     const bingo = await BingoController.fetchBingo(ownerCode);
     socket.emit(RES_FETCH_BINGO, bingo);
   };

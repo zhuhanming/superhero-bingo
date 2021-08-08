@@ -1,5 +1,5 @@
 import {
-  IO_CONNECT,
+  CONNECT,
   REQ_CREATE_BINGO,
   REQ_FETCH_BINGO,
   REQ_UPDATE_BINGO,
@@ -10,8 +10,9 @@ import { Server } from 'socket.io';
 import * as BingoHandler from './bingo';
 
 const setUpIo = (io: Server): void => {
-  io.on(IO_CONNECT, (socket) => {
+  io.on(CONNECT, (socket) => {
     console.log('IO connected');
+    socket.on(CONNECT, () => console.log('Socket connected'));
     // Bingo handlers
     socket.on(REQ_CREATE_BINGO, BingoHandler.socketCreateBingo(io, socket));
     socket.on(REQ_UPDATE_BINGO, BingoHandler.socketUpdateBingo(io, socket));

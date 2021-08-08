@@ -1,4 +1,4 @@
-export const IO_CONNECT = 'connection';
+export const CONNECT = 'connect';
 
 export const REQ_CREATE_BINGO = 'req_create_bingo';
 export const RES_CREATE_BINGO = 'res_create_bingo';

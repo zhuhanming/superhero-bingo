@@ -36,12 +36,12 @@ export class ApiServer {
     server.timeout = 1200000;
     const io = new SocketServer(server, {
       cors: {
-        origin:
-          process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : '',
+        origin: '*',
         methods: ['GET', 'POST'],
-        credentials: true,
       },
       allowEIO3: true,
+      maxHttpBufferSize: 1e8,
+      pingTimeout: 60000,
     });
     server.listen(port);
     setUpIo(io);
