@@ -5,6 +5,7 @@ type LoadingState = {
   isFetching: boolean;
   isSaving: boolean;
   isStartingGame: boolean;
+  isJoining: boolean;
 };
 
 export interface MiscDux {
@@ -16,6 +17,7 @@ const initialState: MiscDux = {
     isFetching: false,
     isSaving: false,
     isStartingGame: false,
+    isJoining: false,
   },
 };
 

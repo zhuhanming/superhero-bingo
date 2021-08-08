@@ -22,7 +22,7 @@ const Game: React.FC = () => {
           className="md:max-w-2xl p-4 text-2xl text-center mb-8"
           placeholder="A1B24C6"
           value={
-            game.joinCode.length > 0 ? game.joinCode : 'Loading Join Code...'
+            game.joinCode.length > 0 ? game.joinCode : 'Loading Room Code...'
           }
           isDisabled
           onChange={() => undefined}

@@ -13,5 +13,9 @@ export const ERROR_FETCH_BINGO = 'error_fetch_bingo';
 export const REQ_CREATE_GAME = 'req_create_game';
 export const RES_CREATE_GAME = 'res_create_game';
 export const ERROR_CREATE_GAME = 'error_create_game';
+export const REQ_JOIN_GAME = 'req_join_game';
+export const RES_JOIN_GAME = 'res_join_game';
+export const ERROR_JOIN_GAME = 'error_join_game';
+export const NOTIF_JOINED_GAME = 'notif_joined_game';
 
 export const SOCKET_DISCONNECT = 'disconnect';

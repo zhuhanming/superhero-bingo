@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import Koala from 'assets/svgr/Koala';
 import PageTitle from 'assets/svgr/PageTitle';
 import Panda from 'assets/svgr/Panda';
-import { START } from 'constants/routes';
+import { JOIN, START } from 'constants/routes';
 
 const Home: React.FC = () => {
   const history = useHistory();
@@ -33,6 +33,7 @@ const Home: React.FC = () => {
         <button
           type="button"
           className="flex flex-col items-center justify-center md:flex-1 h-96 bg-blue mt-8 md:ml-8 p-8 rounded-3xl border-black border-12 transform transition duration-500 hover:scale-105 shadow-lg"
+          onClick={() => history.push(JOIN)}
         >
           <Panda />
           <p className="text-5xl mt-8 font-bold">Join</p>

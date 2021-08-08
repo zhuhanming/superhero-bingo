@@ -1,10 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
-import { EDIT, GAME, ROOT, START } from 'constants/routes';
+import { EDIT, GAME, JOIN, ROOT, START } from 'constants/routes';
 import Edit from 'routes/edit';
 import Game from 'routes/game';
 import Home from 'routes/home';
+import Join from 'routes/join';
 import Start from 'routes/start';
 
 const App: React.FC = () => {
@@ -20,6 +21,9 @@ const App: React.FC = () => {
           </Route>
           <Route path={GAME}>
             <Game />
+          </Route>
+          <Route path={JOIN}>
+            <Join />
           </Route>
           <Route path={ROOT}>
             <Home />
