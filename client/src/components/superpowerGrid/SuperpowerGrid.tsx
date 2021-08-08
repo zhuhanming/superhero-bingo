@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import autosize from 'autosize';
 
-import { MAX_DESCRIPTION_LENGTH } from 'constants/bingo';
+import { MAX_DESCRIPTION_LENGTH } from 'constants/text';
 import { DuxSuperpower } from 'reducers/bingoDux';
 import { sortByOrder } from 'utils/sortUtils';
 

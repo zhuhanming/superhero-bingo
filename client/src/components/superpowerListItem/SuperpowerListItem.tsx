@@ -4,7 +4,7 @@ import { Draggable } from 'react-beautiful-dnd';
 import BingoInput from 'components/bingoInput';
 import DragHandle from 'components/dragHandle';
 import TrashIcon from 'components/trashIcon';
-import { MAX_DESCRIPTION_LENGTH } from 'constants/bingo';
+import { MAX_DESCRIPTION_LENGTH } from 'constants/text';
 import { DuxSuperpower } from 'reducers/bingoDux';
 
 type Props = DuxSuperpower & {

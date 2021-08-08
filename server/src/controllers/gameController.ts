@@ -1,4 +1,4 @@
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { CreatedBingo, Game, Superhero } from 'shared';
 
 import prisma from 'lib/prisma';
@@ -58,6 +58,12 @@ export const joinGame = async (
   if (game === null) {
     throw new Error('Invalid room code provided!');
   }
+  if (game.hasEnded) {
+    throw new Error('The game has already ended!');
+  }
+  if (game.hasStarted) {
+    throw new Error('The game has already started!');
+  }
   const bingo = await prisma.bingo.findUnique({
     where: {
       id: game.bingoId,
@@ -98,4 +104,90 @@ export const joinGame = async (
   });
 
   return { game, bingo, user, token };
+};
+
+export const fetchGame = async (gameId: number): Promise<Game> => {
+  const game = await prisma.game.findUnique({
+    where: {
+      id: gameId,
+    },
+    include: {
+      heroes: true,
+    },
+  });
+  if (game === null) {
+    throw new Error('Invalid game ID provided!');
+  }
+  return game;
+};
+
+// Returns the game ID so that the socket can broadcast this message.
+export const leaveGame = async (
+  token: string
+): Promise<{ gameId: number; superheroId: number }> => {
+  let payload;
+  try {
+    payload = verify(token, process.env.JWT_SECRET!);
+    if (typeof payload !== 'object') {
+      throw new Error();
+    }
+  } catch (error) {
+    throw new Error('Invalid token provided!');
+  }
+
+  const hero = await prisma.superhero.findUnique({
+    where: {
+      id: payload.userId,
+    },
+  });
+  if (
+    hero === null ||
+    hero.gameId !== payload.gameId ||
+    hero.name !== payload.name
+  ) {
+    throw new Error('Invalid credentials stored in token!');
+  }
+
+  await prisma.superhero.delete({
+    where: {
+      id: hero.id,
+    },
+  });
+
+  return { gameId: payload.gameId, superheroId: payload.userId };
+};
+
+export const startGame = async (
+  gameId: number,
+  ownerCode: string
+): Promise<Game> => {
+  const game = await prisma.game.findUnique({
+    where: {
+      id: gameId,
+    },
+    include: {
+      bingo: true,
+    },
+  });
+  if (game === null) {
+    throw new Error('The game cannot be found!');
+  }
+  if (game.hasStarted || game.hasEnded) {
+    throw new Error('The game has already started or ended!');
+  }
+  if (game.bingo.ownerCode !== ownerCode) {
+    throw new Error('You are not the owner of this bingo!');
+  }
+  const updatedGame = await prisma.game.update({
+    where: {
+      id: gameId,
+    },
+    data: {
+      hasStarted: true,
+    },
+    include: {
+      heroes: true,
+    },
+  });
+  return updatedGame;
 };

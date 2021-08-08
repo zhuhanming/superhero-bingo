@@ -4,8 +4,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 type LoadingState = {
   isFetching: boolean;
   isSaving: boolean;
-  isStartingGame: boolean;
+  isCreatingRoom: boolean;
   isJoining: boolean;
+  isStartingGame: boolean;
+  isEndingGame: boolean;
 };
 
 export interface MiscDux {
@@ -16,8 +18,10 @@ const initialState: MiscDux = {
   loading: {
     isFetching: false,
     isSaving: false,
-    isStartingGame: false,
+    isCreatingRoom: false,
     isJoining: false,
+    isStartingGame: false,
+    isEndingGame: false,
   },
 };
 

@@ -11,6 +11,7 @@ export interface GameDux {
   self: DuxSuperhero;
   isOwner: boolean;
   lastFetched: number;
+  leaderboard: { [heroId: number]: number };
 }
 
 const initialState: GameDux = {
@@ -30,6 +31,7 @@ const initialState: GameDux = {
   },
   isOwner: false,
   lastFetched: Date.now(),
+  leaderboard: {},
 };
 
 // Contains user information, theme, view selected and fun fact of the day
@@ -45,6 +47,21 @@ const game = createSlice({
       const superheroes = state.game.heroes.slice();
       superheroes.push(action.payload);
       state.game.heroes = superheroes;
+    },
+    removeSuperhero: (state, action: PayloadAction<number>): void => {
+      const superheroes = state.game.heroes
+        .slice()
+        .filter((s) => s.id !== action.payload);
+      state.game.heroes = superheroes;
+      const leaderboard = { ...state.leaderboard };
+      delete leaderboard[action.payload];
+      state.leaderboard = leaderboard;
+    },
+    updateSuperheroScore: (
+      state,
+      action: PayloadAction<{ superheroId: number; score: number }>
+    ): void => {
+      state.leaderboard[action.payload.superheroId] = action.payload.score;
     },
     setIsOwner: (state, action: PayloadAction<boolean>): void => {
       state.isOwner = action.payload;
@@ -70,16 +87,22 @@ const game = createSlice({
         token: '',
       };
     },
+    clearLeaderboard: (state): void => {
+      state.leaderboard = {};
+    },
   },
 });
 
 export const {
   setGame,
   addSuperhero,
+  removeSuperhero,
+  updateSuperheroScore,
   setSelf,
   setIsOwner,
   clearGame,
   clearSelf,
+  clearLeaderboard,
 } = game.actions;
 
 export default game.reducer;

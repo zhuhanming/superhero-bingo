@@ -3,6 +3,10 @@ import {
   REQ_CREATE_BINGO,
   REQ_CREATE_GAME,
   REQ_FETCH_BINGO,
+  REQ_FETCH_GAME,
+  REQ_JOIN_GAME,
+  REQ_LEAVE_GAME,
+  REQ_START_GAME,
   REQ_UPDATE_BINGO,
   SOCKET_DISCONNECT,
 } from 'shared';
@@ -22,6 +26,10 @@ const setUpIo = (io: Server): void => {
 
     // Game handlers
     socket.on(REQ_CREATE_GAME, GameHandler.socketCreateGame(io, socket));
+    socket.on(REQ_JOIN_GAME, GameHandler.socketJoinGame(io, socket));
+    socket.on(REQ_FETCH_GAME, GameHandler.socketFetchGame(io, socket));
+    socket.on(REQ_LEAVE_GAME, GameHandler.socketLeaveGame(io, socket));
+    socket.on(REQ_START_GAME, GameHandler.socketStartGame(io, socket));
 
     socket.on(SOCKET_DISCONNECT, () => {
       // TODO: Clean up

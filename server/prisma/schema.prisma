@@ -26,6 +26,8 @@ model Game {
   id         Int         @id @default(autoincrement())
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+  startedAt  DateTime?
+  endedAt    DateTime?
   joinCode   String      @unique // For now, we don't foresee there being collisions
   bingo      Bingo       @relation(fields: [bingoId], references: [id], onDelete: Cascade)
   bingoId    Int

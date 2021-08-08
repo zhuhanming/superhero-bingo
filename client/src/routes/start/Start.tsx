@@ -60,7 +60,7 @@ const Start: React.FC = () => {
   };
 
   return (
-    <div>
+    <>
       <Navbar />
       <main
         style={{ minHeight: 'calc(100vh - 6rem)' }}
@@ -91,7 +91,7 @@ const Start: React.FC = () => {
           className="md:max-w-2xl p-4 bg-blue border-black border-8"
         />
       </main>
-    </div>
+    </>
   );
 };
 

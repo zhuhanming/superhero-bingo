@@ -12,8 +12,8 @@ import BingoInput from 'components/bingoInput';
 import Navbar from 'components/navbar';
 import SuperpowerGrid from 'components/superpowerGrid';
 import SuperpowerListItem from 'components/superpowerListItem';
-import { MAX_DESCRIPTION_LENGTH } from 'constants/bingo';
 import { GAME } from 'constants/routes';
+import { MAX_DESCRIPTION_LENGTH } from 'constants/text';
 import { useSocket } from 'contexts/SocketContext';
 import {
   addBingoSuperpower,
@@ -33,7 +33,7 @@ const Edit: React.FC = () => {
   const { bingo } = useSelector((state: RootState) => state.bingo);
   const lastFetched = useSelector((state: RootState) => state.game.lastFetched);
   const [previousLastFetch, setPreviousLastFetched] = useState(lastFetched);
-  const { isSaving, isStartingGame } = useSelector(
+  const { isSaving, isCreatingRoom } = useSelector(
     (state: RootState) => state.misc.loading
   );
   const dispatch = useDispatch();
@@ -74,7 +74,7 @@ const Edit: React.FC = () => {
       toast(error.message, { type: 'error' });
       return;
     }
-    dispatch(updateLoadingState({ isStartingGame: true }));
+    dispatch(updateLoadingState({ isCreatingRoom: true }));
     dispatch(clearGame());
     updateBingo(socket, bingo);
     createGame(socket, bingo.ownerCode);
@@ -169,7 +169,7 @@ const Edit: React.FC = () => {
           <BingoButton
             text="Add New Superpower"
             onClick={onClickAdd}
-            isDisabled={superpowers.length >= 25 || isSaving || isStartingGame}
+            isDisabled={superpowers.length >= 25 || isSaving || isCreatingRoom}
             className="text-lg p-2 bg-white border-black border-4 mt-2"
             hasHover={false}
           />
@@ -177,15 +177,15 @@ const Edit: React.FC = () => {
             text="Save Changes"
             className="text-lg p-2 bg-blue border-black border-4 mt-2"
             onClick={onClickSave}
-            isDisabled={isStartingGame}
+            isDisabled={isCreatingRoom}
             isLoading={isSaving}
           />
           <BingoButton
-            text="Start Game"
+            text="Create Room"
             className="text-lg p-2 bg-green border-black border-4 mt-2"
             onClick={onClickStart}
             isDisabled={bingo.id < 0 || isSaving}
-            isLoading={isStartingGame}
+            isLoading={isCreatingRoom}
           />
         </div>
         <div className="hidden md:block" style={{ flex: 3 }}>

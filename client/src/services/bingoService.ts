@@ -23,14 +23,6 @@ export const fetchBingo = (socket: Socket, ownerCode: string): void => {
   socket.emit(REQ_FETCH_BINGO, ownerCode);
 };
 
-export const createBingo = (socket: Socket, bingo: Bingo): void => {
-  socket.emit(REQ_CREATE_BINGO, bingo);
-};
-
-export const updateBingo = (socket: Socket, bingo: UpdatedBingo): void => {
-  socket.emit(REQ_UPDATE_BINGO, bingo);
-};
-
 const receivedBingo = (socket: Socket): void => {
   socket.on(RES_FETCH_BINGO, (payload: CreatedBingo) => {
     store.dispatch(updateLoadingState({ isFetching: false }));
@@ -43,6 +35,10 @@ const errorFetchBingo = (socket: Socket): void => {
     store.dispatch(updateLoadingState({ isFetching: false }));
     toast(payload, { type: 'error' });
   });
+};
+
+export const createBingo = (socket: Socket, bingo: Bingo): void => {
+  socket.emit(REQ_CREATE_BINGO, bingo);
 };
 
 const createdBingo = (socket: Socket): void => {
@@ -58,6 +54,10 @@ const errorCreateBingo = (socket: Socket): void => {
     store.dispatch(updateLoadingState({ isFetching: false }));
     toast(payload, { type: 'error' });
   });
+};
+
+export const updateBingo = (socket: Socket, bingo: UpdatedBingo): void => {
+  socket.emit(REQ_UPDATE_BINGO, bingo);
 };
 
 const updatedBingo = (socket: Socket): void => {
