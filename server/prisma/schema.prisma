@@ -23,14 +23,15 @@ model Bingo {
 }
 
 model Game {
-  id        Int         @id @default(autoincrement())
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  joinCode  String      @unique // For now, we don't foresee there being collisions
-  bingo     Bingo       @relation(fields: [bingoId], references: [id], onDelete: Cascade)
-  bingoId   Int
-  isOngoing Boolean     @default(true)
-  heroes    Superhero[]
+  id         Int         @id @default(autoincrement())
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  joinCode   String      @unique // For now, we don't foresee there being collisions
+  bingo      Bingo       @relation(fields: [bingoId], references: [id], onDelete: Cascade)
+  bingoId    Int
+  hasStarted Boolean     @default(false)
+  hasEnded   Boolean     @default(false)
+  heroes     Superhero[]
 }
 
 model Superpower {
