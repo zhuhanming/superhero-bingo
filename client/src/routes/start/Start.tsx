@@ -8,18 +8,17 @@ import Navbar from 'components/navbar';
 import { EDIT } from 'constants/routes';
 import { useSocket } from 'contexts/SocketContext';
 import { clearBingo } from 'reducers/bingoDux';
-import { updateErrorMessages, updateLoadingState } from 'reducers/miscDux';
+import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
-import { fetchBingo } from 'services/socketRequestService';
+import { fetchBingo } from 'services/bingoService';
 
 const Start: React.FC = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const fetchErrorMessage = useSelector(
-    (state: RootState) => state.misc.errors.fetchBingoError
+  const lastFetched = useSelector(
+    (state: RootState) => state.bingo.lastFetched
   );
-  const bingoId = useSelector((state: RootState) => state.bingo.bingo.id);
-  const [previousBingoId, setPreviousBingoId] = useState(bingoId);
+  const [previousLastFetch, setPreviousLastFetched] = useState(lastFetched);
   const isFetching = useSelector(
     (state: RootState) => state.misc.loading.isFetching
   );
@@ -27,21 +26,24 @@ const Start: React.FC = () => {
   const [code, setCode] = useState('');
 
   useEffect(() => {
-    if (bingoId !== -1 && bingoId !== previousBingoId) {
+    dispatch(clearBingo());
+  }, []);
+
+  useEffect(() => {
+    if (lastFetched !== previousLastFetch) {
       history.push(EDIT);
+      setPreviousLastFetched(lastFetched);
     }
-  }, [bingoId]);
+  }, [lastFetched]);
 
   const onClickCreate = async () => {
     if (isFetching) return;
     dispatch(clearBingo());
-    setPreviousBingoId(-1);
     history.push(EDIT);
   };
 
   const onClickUpdate = async () => {
     if (isFetching || code.length < 6) return;
-    dispatch(updateErrorMessages({ fetchBingoError: '' }));
     dispatch(updateLoadingState({ isFetching: true }));
     fetchBingo(socket, code);
   };
@@ -54,7 +56,6 @@ const Start: React.FC = () => {
       return;
     }
     setCode(newCode.toUpperCase());
-    dispatch(updateErrorMessages({ fetchBingoError: '' }));
     dispatch(clearBingo());
   };
 
@@ -89,7 +90,6 @@ const Start: React.FC = () => {
           onClick={onClickUpdate}
           className="md:max-w-2xl p-4 bg-blue border-black border-8"
         />
-        <h2 className="text-red mt-2">{fetchErrorMessage ?? ' '}</h2>
       </main>
     </div>
   );

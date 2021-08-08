@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import autosize from 'autosize';
 import { validateBingo } from 'shared';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,6 +13,7 @@ import Navbar from 'components/navbar';
 import SuperpowerGrid from 'components/superpowerGrid';
 import SuperpowerListItem from 'components/superpowerListItem';
 import { MAX_DESCRIPTION_LENGTH } from 'constants/bingo';
+import { GAME } from 'constants/routes';
 import { useSocket } from 'contexts/SocketContext';
 import {
   addBingoSuperpower,
@@ -19,21 +22,44 @@ import {
   updateBingoSuperpower,
   updateBingoSuperpowers,
 } from 'reducers/bingoDux';
+import { clearGame } from 'reducers/gameDux';
+import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
-import { createBingo, updateBingo } from 'services/socketRequestService';
+import { createBingo, updateBingo } from 'services/bingoService';
+import { createGame } from 'services/gameService';
 import { sortByOrder } from 'utils/sortUtils';
 
 const Edit: React.FC = () => {
   const { bingo } = useSelector((state: RootState) => state.bingo);
+  const lastFetched = useSelector((state: RootState) => state.game.lastFetched);
+  const [previousLastFetch, setPreviousLastFetched] = useState(lastFetched);
+  const { isSaving, isStartingGame } = useSelector(
+    (state: RootState) => state.misc.loading
+  );
   const dispatch = useDispatch();
   const { socket } = useSocket();
+  const history = useHistory();
   const superpowers = bingo.superpowers.slice().sort(sortByOrder);
+
+  useEffect(() => {
+    if (lastFetched !== previousLastFetch) {
+      history.push(GAME);
+      setPreviousLastFetched(lastFetched);
+    }
+  }, [lastFetched]);
 
   const onClickAdd = () => {
     dispatch(addBingoSuperpower());
   };
 
   const onClickSave = () => {
+    try {
+      validateBingo(bingo);
+    } catch (error) {
+      toast(error.message, { type: 'error' });
+      return;
+    }
+    dispatch(updateLoadingState({ isSaving: true }));
     if (bingo.ownerCode.length === 6) {
       updateBingo(socket, bingo);
     } else {
@@ -42,7 +68,16 @@ const Edit: React.FC = () => {
   };
 
   const onClickStart = () => {
-    // Do something
+    try {
+      validateBingo(bingo);
+    } catch (error) {
+      toast(error.message, { type: 'error' });
+      return;
+    }
+    dispatch(updateLoadingState({ isStartingGame: true }));
+    dispatch(clearGame());
+    updateBingo(socket, bingo);
+    createGame(socket, bingo.ownerCode);
   };
 
   const onDragEnd = (dropResult: DropResult) => {
@@ -84,15 +119,6 @@ const Edit: React.FC = () => {
     dispatch(deleteBingoSuperpower(index));
   };
 
-  const isValidBingo = (): boolean => {
-    try {
-      validateBingo(bingo);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  };
-
   return (
     <>
       <Navbar />
@@ -111,7 +137,7 @@ const Edit: React.FC = () => {
           <h2 className="font-bold text-lg">Owner Code</h2>
           <BingoInput
             className="p-2 text-lg mb-4"
-            placeholder="You need to save first!"
+            placeholder="Save this collection to get a code"
             value={bingo.ownerCode}
             onChange={() => undefined}
             isDisabled
@@ -143,7 +169,7 @@ const Edit: React.FC = () => {
           <BingoButton
             text="Add New Superpower"
             onClick={onClickAdd}
-            isDisabled={superpowers.length >= 25}
+            isDisabled={superpowers.length >= 25 || isSaving || isStartingGame}
             className="text-lg p-2 bg-white border-black border-4 mt-2"
             hasHover={false}
           />
@@ -151,13 +177,15 @@ const Edit: React.FC = () => {
             text="Save Changes"
             className="text-lg p-2 bg-blue border-black border-4 mt-2"
             onClick={onClickSave}
-            isDisabled={!isValidBingo()}
+            isDisabled={isStartingGame}
+            isLoading={isSaving}
           />
           <BingoButton
             text="Start Game"
             className="text-lg p-2 bg-green border-black border-4 mt-2"
             onClick={onClickStart}
-            isDisabled={!isValidBingo() || bingo.id < 0}
+            isDisabled={bingo.id < 0 || isSaving}
+            isLoading={isStartingGame}
           />
         </div>
         <div className="hidden md:block" style={{ flex: 3 }}>

@@ -2,11 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import store, { persistor } from 'app/store';
 import AppProviders from 'contexts';
 
+import 'react-toastify/dist/ReactToastify.css';
 import './index.css';
 
 import App from './app';
@@ -19,6 +21,7 @@ ReactDOM.render(
         <BrowserRouter>
           <AppProviders>
             <App />
+            <ToastContainer bodyClassName="font-regular" />
           </AppProviders>
         </BrowserRouter>
       </PersistGate>

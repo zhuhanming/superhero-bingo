@@ -3,7 +3,7 @@ import React, { useEffect } from 'react';
 import { CONNECT } from 'shared';
 import { io, Socket } from 'socket.io-client';
 
-import { initalizeSocket } from 'services/socketResponseService';
+import { initializeSocket } from 'services';
 
 export default interface SocketContextInterface {
   socket: Socket;
@@ -25,7 +25,7 @@ const SocketProvider: React.FunctionComponent = (props) => {
     socket.on(CONNECT, () => {
       // eslint-disable-next-line no-console
       console.log('Socket connected!');
-      initalizeSocket(socket);
+      initializeSocket(socket);
     });
     socket.on('connect_error', (err) => {
       // eslint-disable-next-line no-console

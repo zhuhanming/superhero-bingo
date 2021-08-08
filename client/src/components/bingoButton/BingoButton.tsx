@@ -3,7 +3,7 @@ import React from 'react';
 type Props = {
   text: string;
   onClick: () => void;
-  isDisabled: boolean;
+  isDisabled?: boolean;
   isLoading?: boolean;
   hasHover?: boolean;
   className?: string;
@@ -16,7 +16,7 @@ type Props = {
 const BingoButton: React.FC<Props> = ({
   text,
   onClick,
-  isDisabled,
+  isDisabled = false,
   isLoading = false,
   hasHover = true,
   className = '',

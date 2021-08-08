@@ -15,6 +15,7 @@ type DuxBingo = Omit<UpdatedBingo, 'superpowers'> & {
 
 export interface BingoDux {
   bingo: DuxBingo;
+  lastFetched: number;
 }
 
 const initialState: BingoDux = {
@@ -24,6 +25,7 @@ const initialState: BingoDux = {
     ownerCode: '',
     superpowers: [],
   },
+  lastFetched: Date.now(),
 };
 
 // Contains user information, theme, view selected and fun fact of the day
@@ -99,6 +101,7 @@ const bingo = createSlice({
       }));
       const bingo = { ...action.payload, superpowers };
       state.bingo = bingo;
+      state.lastFetched = Date.now();
     },
     clearBingo: (state): void => {
       state.bingo = {
