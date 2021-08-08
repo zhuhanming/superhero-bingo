@@ -35,4 +35,8 @@ export const validateBingo = (
       throw new Error('Superpower orders are invalid!');
     }
   }
+  const descriptions = new Set(bingo.superpowers.map((s) => s.description));
+  if (descriptions.size !== bingo.superpowers.length) {
+    throw new Error('Superpower descriptions must be unique!');
+  }
 };

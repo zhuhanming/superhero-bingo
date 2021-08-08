@@ -1,6 +1,10 @@
+import { Superhero } from './superhero';
+
 export type Game = {
   id: number;
   bingoId: number;
   joinCode: string;
-  isOngoing: boolean;
+  hasStarted: boolean;
+  hasEnded: boolean;
+  heroes: Superhero[];
 };
