@@ -32,19 +32,26 @@ const SuperpowerGrid: React.FC<Props> = ({ superpowers }) => {
   };
 
   return (
-    <div className="flex items-center w-full h-full pl-20">
-      <div
-        className={`w-full grid grid-cols-${gridSize} border-black border-t-8 border-l-8`}
-      >
-        {superpowersToRender.map((s) => (
-          <div
-            className={`bg-red border-black border-b-8 border-r-8 superpower-grid-cell flex justify-center items-center p-2 text-center break-all ${getFontSize()}`}
-            key={s.uniqueId}
-          >
-            {s.description}
-          </div>
-        ))}
-      </div>
+    <div className="flex items-center justify-center w-full h-full pl-20">
+      {superpowersToRender.length === 0 && (
+        <h1 className="font-bold text-xl mb-4">
+          Add a superpower to get started!
+        </h1>
+      )}
+      {superpowersToRender.length > 0 && (
+        <div
+          className={`w-full grid grid-cols-${gridSize} border-black border-t-8 border-l-8`}
+        >
+          {superpowersToRender.map((s) => (
+            <div
+              className={`bg-red border-black border-b-8 border-r-8 superpower-grid-cell flex justify-center items-center p-2 text-center break-all ${getFontSize()}`}
+              key={s.uniqueId}
+            >
+              {s.description}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

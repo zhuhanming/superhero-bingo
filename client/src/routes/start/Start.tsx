@@ -1,32 +1,50 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import BingoButton from 'components/bingoButton';
 import Navbar from 'components/navbar';
 import { EDIT } from 'constants/routes';
 import { useSocket } from 'contexts/SocketContext';
 import { clearBingo } from 'reducers/bingoDux';
+import { updateErrorMessages } from 'reducers/miscDux';
+import { RootState } from 'reducers/rootReducer';
 import { fetchBingo } from 'services/socketRequestService';
 
 const Start: React.FC = () => {
   const history = useHistory();
   const dispatch = useDispatch();
+  const fetchErrorMessage = useSelector(
+    (state: RootState) => state.misc.errors.fetchBingoError
+  );
+  const bingoId = useSelector((state: RootState) => state.bingo.bingo.id);
   const { socket } = useSocket();
 
   const [isLoading, setIsLoading] = useState(false);
   const [code, setCode] = useState('');
 
+  useEffect(() => {
+    if (fetchErrorMessage.length > 0) {
+      setIsLoading(false);
+    }
+  }, [fetchErrorMessage]);
+
+  useEffect(() => {
+    if (bingoId !== -1) {
+      history.push(EDIT);
+    }
+  }, [bingoId]);
+
   const onClickCreate = async () => {
     if (isLoading) return;
-    dispatch(clearBingo());
     history.push(EDIT);
   };
 
   const onClickUpdate = async () => {
     if (isLoading || code.length < 6) return;
+    dispatch(updateErrorMessages({ fetchBingoError: '' }));
     setIsLoading(true);
     fetchBingo(socket, code);
-    history.push(EDIT);
   };
 
   const onUpdateCode = (newCode: string) => {
@@ -37,6 +55,8 @@ const Start: React.FC = () => {
       return;
     }
     setCode(newCode.toUpperCase());
+    dispatch(updateErrorMessages({ fetchBingoError: '' }));
+    dispatch(clearBingo());
   };
 
   return (
@@ -49,17 +69,13 @@ const Start: React.FC = () => {
         <h1 className="font-bold text-3xl mb-12">
           Get Started with Superpower Creation!
         </h1>
-        <button
-          type="button"
-          className={`w-full md:max-w-2xl font-bold text-lg p-4 bg-blue rounded-xl border-black border-8 transform transition duration-500 shadow-lg ${
-            isLoading ? 'cursor-not-allowed opacity-60' : 'hover:scale-105'
-          }`}
-          disabled={isLoading}
+        <BingoButton
+          text="Create New Collection"
+          isDisabled={isLoading}
           onClick={onClickCreate}
-        >
-          Create New Collection
-        </button>
-        <h1 className="font-bold text-lg my-12">- OR -</h1>
+          className="md:max-w-2xl p-4 bg-blue border-black border-8"
+        />
+        <h1 className="font-bold text-lg my-8">- OR -</h1>
         <input
           className="w-full md:max-w-2xl rounded-xl p-4 text-2xl text-center font-medium mb-8"
           placeholder="A1B24C6"
@@ -67,16 +83,14 @@ const Start: React.FC = () => {
           onChange={(e) => onUpdateCode(e.target.value)}
           disabled={isLoading}
         />
-        <button
-          type="button"
-          className={`w-full md:max-w-2xl font-bold text-lg p-4 bg-blue rounded-xl border-black border-8 transform transition duration-500 shadow-lg ${
-            isLoading ? 'animate-pulse' : 'hover:scale-105'
-          } ${code.length < 6 ? 'cursor-not-allowed opacity-60' : ''}`}
-          disabled={isLoading || code.length < 6}
+        <BingoButton
+          text={isLoading ? 'Loading...' : 'Edit Existing Collection'}
+          isDisabled={code.length < 6}
+          isLoading={isLoading}
           onClick={onClickUpdate}
-        >
-          {isLoading ? 'Loading...' : 'Edit Existing Collection'}
-        </button>
+          className="md:max-w-2xl p-4 bg-blue border-black border-8"
+        />
+        <h2 className="text-red mt-2">{fetchErrorMessage ?? ' '}</h2>
       </main>
     </div>
   );
