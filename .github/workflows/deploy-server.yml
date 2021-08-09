@@ -35,7 +35,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           rm: true
           source: "server/build/"
-          target: "${{ secrets.REMOTE_DIR }}/server"
+          target: "${{ secrets.REMOTE_DIR }}/server/build"
       - name: Pull latest repository
         uses: appleboy/ssh-action@master
         with:
@@ -49,6 +49,11 @@ jobs:
             git pull
             git reset --hard origin/main
             yarn install
+            cd server/build/build
+            mv * ..
+            cd ..
+            rm -rf build
+            cd ../..
             pm2 stop ecosystem.config.js --only superhero-bingo
             yarn migrate
             cp ecosystem.config.js ./server/build/
@@ -56,5 +61,4 @@ jobs:
             cp .env ./build/
             cp package.json ./build/
             cd build
-            yarn install
             pm2 restart ecosystem.config.js --only superhero-bingo --log-date-format="YYYY-MM-DD HH:mm Z"
