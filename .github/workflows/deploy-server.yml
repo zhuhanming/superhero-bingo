@@ -36,29 +36,29 @@ jobs:
           rm: true
           source: "server/build/"
           target: "${{ secrets.REMOTE_DIR }}/server/build"
-      # - name: Pull latest repository
-      #   uses: appleboy/ssh-action@master
-      #   with:
-      #     host: ${{ secrets.REMOTE_HOST }}
-      #     username: ${{ secrets.REMOTE_USER }}
-      #     key: ${{ secrets.SSH_KEY }}
-      #     port: 22
-      #     script: |
-      #       cd ${{ secrets.REMOTE_DIR }}
-      #       git checkout main
-      #       git pull
-      #       git reset --hard origin/main
-      #       yarn install
-      #       cd server/build/build
-      #       mv * ..
-      #       cd ..
-      #       rm -rf build
-      #       cd ../..
-      #       pm2 stop ecosystem.config.js --only superhero-bingo
-      #       yarn migrate
-      #       cp ecosystem.config.js ./server/build/
-      #       cd server
-      #       cp .env ./build/
-      #       cp package.json ./build/
-      #       cd build
-      #       pm2 restart ecosystem.config.js --only superhero-bingo --log-date-format="YYYY-MM-DD HH:mm Z"
+      - name: Pull latest repository
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            cd ${{ secrets.REMOTE_DIR }}
+            git checkout main
+            git pull
+            git reset --hard origin/main
+            yarn install
+            cd server/build/server/build
+            mv * ../..
+            cd ../..
+            rm -rf server
+            cd ../..
+            pm2 stop ecosystem.config.js --only superhero-bingo
+            yarn migrate
+            cp ecosystem.config.js ./server/build/
+            cd server
+            cp .env ./build/
+            cp package.json ./build/
+            cd build
+            pm2 restart ecosystem.config.js --only superhero-bingo --log-date-format="YYYY-MM-DD HH:mm Z"
