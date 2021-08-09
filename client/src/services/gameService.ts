@@ -7,6 +7,7 @@ import {
   ERROR_LEAVE_GAME,
   ERROR_START_GAME,
   Game,
+  Invite,
   NOTIF_JOIN_GAME,
   NOTIF_LEAVE_GAME,
   NOTIF_START_GAME,
@@ -33,6 +34,7 @@ import {
   clearSelf,
   removeSuperhero,
   setGame,
+  setInvitations,
   setIsOwner,
   setSelf,
 } from 'reducers/gameDux';
@@ -73,10 +75,12 @@ const joinedGame = (socket: Socket): void => {
       bingo: CreatedBingo;
       user: Superhero;
       token: string;
+      invites: Invite[];
     }) => {
       store.dispatch(updateLoadingState({ isJoining: false }));
       store.dispatch(setBingo(payload.bingo));
       store.dispatch(setGame(payload.game));
+      store.dispatch(setInvitations(payload.invites));
       store.dispatch(setIsOwner(false));
       store.dispatch(setSelf({ ...payload.user, token: payload.token }));
     }

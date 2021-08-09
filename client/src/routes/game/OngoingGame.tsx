@@ -20,7 +20,7 @@ const OngoingGame: React.FC = () => {
     <>
       <Navbar />
       <main className="flex mt-8" style={{ height: 'calc(100vh - 8rem)' }}>
-        <div className="hidden md:block" style={{ flex: 3 }}>
+        <div className="hidden md:block mr-8" style={{ flex: 3 }}>
           <h1 className="font-bold text-2xl mb-4">How to Play</h1>
           <p className="text-lg font-regular mb-4">
             You should see a grid of {bingo.superpowers.length} superpowers in

@@ -57,12 +57,10 @@ export const socketJoinGame = (
     console.log('Name received: ', data.name);
 
     try {
-      const { game, bingo, user, token } = await GameController.joinGame(
-        data.joinCode,
-        data.name
-      );
+      const { game, bingo, user, token, invites } =
+        await GameController.joinGame(data.joinCode, data.name);
       socket.join(`room-${game.id}`);
-      socket.emit(RES_JOIN_GAME, { game, bingo, user, token });
+      socket.emit(RES_JOIN_GAME, { game, bingo, user, token, invites });
       // Notify all current users that someone joined
       socket.to(`room-${game.id}`).emit(NOTIF_JOIN_GAME, user);
     } catch (error) {

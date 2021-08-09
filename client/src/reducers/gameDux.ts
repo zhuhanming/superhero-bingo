@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Game, Superhero } from 'shared';
+import { Game, Invite, Superhero } from 'shared';
 
 export type DuxSuperhero = Superhero & {
   token: string;
@@ -12,6 +12,7 @@ export interface GameDux {
   isOwner: boolean;
   lastFetched: number;
   leaderboard: { [heroId: number]: number };
+  invitations: Invite[];
 }
 
 const initialState: GameDux = {
@@ -32,6 +33,7 @@ const initialState: GameDux = {
   isOwner: false,
   lastFetched: Date.now(),
   leaderboard: {},
+  invitations: [],
 };
 
 // Contains user information, theme, view selected and fun fact of the day
@@ -69,6 +71,25 @@ const game = createSlice({
     setSelf: (state, action: PayloadAction<DuxSuperhero>): void => {
       state.self = action.payload;
     },
+    setInvitations: (state, action: PayloadAction<Invite[]>): void => {
+      state.invitations = action.payload;
+    },
+    signInvitation: (
+      state,
+      action: PayloadAction<{ superpowerId: number; signeeId: number }>
+    ): void => {
+      const { superpowerId, signeeId } = action.payload;
+      const invitation = state.invitations.find(
+        (i) => i.superpowerId === superpowerId
+      );
+      if (invitation == null) {
+        return;
+      }
+      const restOfInvitations = state.invitations.filter(
+        (i) => i.superpowerId !== superpowerId
+      );
+      state.invitations = [...restOfInvitations, { ...invitation, signeeId }];
+    },
     clearGame: (state): void => {
       state.game = {
         id: -1,
@@ -90,6 +111,9 @@ const game = createSlice({
     clearLeaderboard: (state): void => {
       state.leaderboard = {};
     },
+    clearInvitations: (state): void => {
+      state.invitations = [];
+    },
   },
 });
 
@@ -100,9 +124,12 @@ export const {
   updateSuperheroScore,
   setSelf,
   setIsOwner,
+  setInvitations,
+  signInvitation,
   clearGame,
   clearSelf,
   clearLeaderboard,
+  clearInvitations,
 } = game.actions;
 
 export default game.reducer;

@@ -192,6 +192,7 @@ const Edit: React.FC = () => {
           <SuperpowerGrid
             superpowers={superpowers}
             onChangeGridCell={onSuperpowerChange}
+            className="pl-20"
           />
         </div>
       </main>

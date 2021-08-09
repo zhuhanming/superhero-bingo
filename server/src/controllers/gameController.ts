@@ -1,10 +1,11 @@
 import { sign, verify } from 'jsonwebtoken';
-import { CreatedBingo, Game, Superhero } from 'shared';
+import { CreatedBingo, Game, Invite, Superhero } from 'shared';
 
 import prisma from 'lib/prisma';
 import { makeCode } from 'utils/codeUtils';
 
 const JOIN_CODE_LENGTH = 6;
+const INVITE_CODE_LENGTH = 8;
 
 export const createGame = async (ownerCode: string): Promise<Game> => {
   const bingo = await prisma.bingo.findUnique({
@@ -46,6 +47,7 @@ export const joinGame = async (
   bingo: CreatedBingo;
   user: Superhero;
   token: string;
+  invites: Invite[];
 }> => {
   const game = await prisma.game.findUnique({
     where: {
@@ -94,6 +96,19 @@ export const joinGame = async (
   });
   game.heroes.push(user);
 
+  const invites = await Promise.all(
+    bingo.superpowers.map((s) => {
+      const inviteCode = makeCode(INVITE_CODE_LENGTH);
+      return prisma.heroPowerPairingInvites.create({
+        data: {
+          superpowerId: s.id,
+          ownerId: user.id,
+          inviteCode,
+        },
+      });
+    })
+  );
+
   const tokenPayload = {
     userId: user.id,
     gameId: game.id,
@@ -103,7 +118,7 @@ export const joinGame = async (
     expiresIn: '7d',
   });
 
-  return { game, bingo, user, token };
+  return { game, bingo, user, token, invites };
 };
 
 export const fetchGame = async (gameId: number): Promise<Game> => {
