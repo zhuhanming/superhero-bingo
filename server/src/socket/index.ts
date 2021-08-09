@@ -7,6 +7,7 @@ import {
   REQ_FETCH_INVITE,
   REQ_JOIN_GAME,
   REQ_LEAVE_GAME,
+  REQ_SIGN_INVITE,
   REQ_START_GAME,
   REQ_UPDATE_BINGO,
   SOCKET_DISCONNECT,
@@ -33,8 +34,9 @@ const setUpIo = (io: Server): void => {
     socket.on(REQ_LEAVE_GAME, GameHandler.socketLeaveGame(io, socket));
     socket.on(REQ_START_GAME, GameHandler.socketStartGame(io, socket));
 
-    // Invite handlers
+    // Invite handlersx
     socket.on(REQ_FETCH_INVITE, InviteHandler.socketFetchInvite(io, socket));
+    socket.on(REQ_SIGN_INVITE, InviteHandler.socketSignInvite(io, socket));
 
     socket.on(SOCKET_DISCONNECT, () => {
       // TODO: Clean up
