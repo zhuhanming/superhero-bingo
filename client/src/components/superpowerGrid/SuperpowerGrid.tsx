@@ -15,7 +15,6 @@ type Props = {
   onChangeGridCell?: (index: number, description: string) => void;
   className?: string;
   invites?: Invite[];
-  superheroes?: Superhero[];
 };
 
 const getNumPowersPerSide = (superpowers: DuxSuperpower[]): number => {
@@ -30,7 +29,6 @@ const SuperpowerGrid: React.FC<Props> = ({
   onChangeGridCell = (_a, _b) => undefined,
   className = '',
   invites = [],
-  superheroes = [],
 }) => {
   const gridSize = getNumPowersPerSide(superpowers);
   const superpowersToRender = superpowers.slice().sort(sortByOrder);
@@ -109,9 +107,8 @@ const SuperpowerGrid: React.FC<Props> = ({
               );
             }
             const invite = invites.find((i) => i.superpowerId === s.id!)!;
-            const signee = superheroes.find((s) => s.id === invite.signeeId);
 
-            if (signee == null) {
+            if (invite.signeeId == null) {
               return (
                 <div
                   className={`bg-red border-black border-b-8 border-r-8 superpower-grid-cell flex justify-center items-center p-2 text-center break-words ${getFontSize()}`}
@@ -140,7 +137,7 @@ const SuperpowerGrid: React.FC<Props> = ({
                 <div className="font-medium flex justify-center">
                   {s.description}
                   <br />
-                  Signed by: {signee.name}
+                  Signed by: {invite.signeeName}
                 </div>
               </div>
             );

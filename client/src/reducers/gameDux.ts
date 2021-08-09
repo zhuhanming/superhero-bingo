@@ -76,21 +76,29 @@ const game = createSlice({
     setInvitations: (state, action: PayloadAction<Invite[]>): void => {
       state.invitations = action.payload;
     },
-    signInvitation: (
+    trySignInvitation: (
       state,
-      action: PayloadAction<{ superpowerId: number; signeeId: number }>
+      action: PayloadAction<{
+        ownerId: number;
+        inviteId: number;
+        signee: Superhero;
+      }>
     ): void => {
-      const { superpowerId, signeeId } = action.payload;
-      const invitation = state.invitations.find(
-        (i) => i.superpowerId === superpowerId
-      );
+      const { ownerId, inviteId, signee } = action.payload;
+      if (ownerId !== state.self.id) {
+        return;
+      }
+      const invitation = state.invitations.find((i) => i.id === inviteId);
       if (invitation == null) {
         return;
       }
       const restOfInvitations = state.invitations.filter(
-        (i) => i.superpowerId !== superpowerId
+        (i) => i.id !== inviteId
       );
-      state.invitations = [...restOfInvitations, { ...invitation, signeeId }];
+      state.invitations = [
+        ...restOfInvitations,
+        { ...invitation, signeeId: signee.id, signeeName: signee.name },
+      ];
     },
     setInviteToSign: (state, action: PayloadAction<Invite>): void => {
       state.inviteToSign = action.payload;
@@ -133,12 +141,13 @@ export const {
   setSelf,
   setIsOwner,
   setInvitations,
-  signInvitation,
+  trySignInvitation,
   setInviteToSign,
   clearGame,
   clearSelf,
   clearLeaderboard,
   clearInvitations,
+  clearInviteToSign,
 } = game.actions;
 
 export default game.reducer;

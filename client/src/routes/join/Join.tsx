@@ -8,6 +8,8 @@ import Navbar from 'components/navbar';
 import { PLAY } from 'constants/routes';
 import { MAX_NAME_LENGTH } from 'constants/text';
 import { useSocket } from 'contexts/SocketContext';
+import { clearBingo } from 'reducers/bingoDux';
+import { clearGame } from 'reducers/gameDux';
 import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
 import { fetchGame, joinGame, leaveGame } from 'services/gameService';
@@ -20,6 +22,7 @@ const Join: React.FC = () => {
     (state: RootState) => state.misc.loading.isJoining
   );
   const { game, self } = useSelector((state: RootState) => state.game);
+  const bingo = useSelector((state: RootState) => state.bingo.bingo);
   const { socket } = useSocket();
   const dispatch = useDispatch();
 
@@ -30,8 +33,11 @@ const Join: React.FC = () => {
   }, [game.id, game.hasStarted, game.hasEnded]);
 
   useEffect(() => {
-    if (game.id !== -1) {
+    if (game.id !== -1 && bingo.id !== -1) {
       fetchGame(socket, game.id);
+    } else {
+      dispatch(clearGame());
+      dispatch(clearBingo());
     }
   }, []);
 

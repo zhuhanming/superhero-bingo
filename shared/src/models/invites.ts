@@ -1,4 +1,5 @@
 export type Invite = {
+  id: number;
   superpowerId: number;
   superpowerDescription: string;
   inviteCode: string;

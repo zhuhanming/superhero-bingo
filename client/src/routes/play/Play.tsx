@@ -1,15 +1,16 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
 import Leaderboard from 'components/leaderboard';
 import SuperpowerGrid from 'components/superpowerGrid';
 import { useSocket } from 'contexts/SocketContext';
+import { clearInviteToSign } from 'reducers/gameDux';
 import { RootState } from 'reducers/rootReducer';
-import { fetchInvite } from 'services/inviteService';
+import { fetchInvite, signInvite } from 'services/inviteService';
 
 enum PlayTab {
   LEADERBOARD,
@@ -19,11 +20,12 @@ enum PlayTab {
 const Play: React.FC = () => {
   const bingo = useSelector((state: RootState) => state.bingo.bingo);
   const [tab, setTab] = useState(PlayTab.LEADERBOARD);
-  const { game, leaderboard, invitations, inviteToSign } = useSelector(
+  const { game, leaderboard, invitations, inviteToSign, self } = useSelector(
     (state: RootState) => state.game
   );
   const [inviteCode, setInviteCode] = useState('');
   const { socket } = useSocket();
+  const dispatch = useDispatch();
 
   const onChangeInviteCode = (newCode: string) => {
     if (
@@ -32,14 +34,18 @@ const Play: React.FC = () => {
     ) {
       return;
     }
+    dispatch(clearInviteToSign());
     setInviteCode(newCode.toUpperCase());
     if (newCode.length === 8) {
-      fetchInvite(socket, newCode);
+      fetchInvite(socket, newCode, self.token);
     }
   };
 
   const onClickSign = () => {
-    // do something
+    if (inviteToSign == null) {
+      return;
+    }
+    signInvite(socket, inviteToSign.inviteCode, self.token);
   };
 
   return (

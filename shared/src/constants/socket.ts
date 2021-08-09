@@ -35,5 +35,9 @@ export const ERROR_END_GAME = 'error_end_game';
 export const REQ_FETCH_INVITE = 'req_fetch_invite';
 export const RES_FETCH_INVITE = 'res_fetch_invite';
 export const ERROR_FETCH_INVITE = 'error_fetch_invite';
+export const REQ_SIGN_INVITE = 'req_sign_invite';
+export const RES_SIGN_INVITE = 'res_sign_invite';
+export const ERROR_SIGN_INVITE = 'error_sign_invite';
+export const NOTIF_SIGN_INVITE = 'notif_sign_invite';
 
 export const SOCKET_DISCONNECT = 'disconnect';
