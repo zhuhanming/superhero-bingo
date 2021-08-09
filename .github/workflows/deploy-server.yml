@@ -3,6 +3,12 @@ name: Deploy Server via SSH
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/deploy-server.yml"
+      - "package.json"
+      - "tsconfig.json"
+      - "server/**/*"
+      - "shared/**/*"
 
 jobs:
   deploy:
