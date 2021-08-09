@@ -106,9 +106,9 @@ const SuperpowerGrid: React.FC<Props> = ({
                 </div>
               );
             }
-            const invite = invites.find((i) => i.superpowerId === s.id!)!;
+            const invite = invites.find((i) => i.superpowerId === s.id!);
 
-            if (invite.signeeId == null) {
+            if (invite?.signeeId == null) {
               return (
                 <div
                   className={`bg-red border-black border-b-8 border-r-8 superpower-grid-cell flex justify-center items-center p-2 text-center break-words ${getFontSize()}`}
@@ -116,13 +116,17 @@ const SuperpowerGrid: React.FC<Props> = ({
                 >
                   <div
                     className="has-tooltip cursor-pointer font-medium flex justify-center"
-                    onClick={() => onClickInviteCode(s.id!, invite.inviteCode)}
+                    onClick={() =>
+                      onClickInviteCode(s.id!, invite?.inviteCode ?? '')
+                    }
                     onKeyDown={() =>
-                      onClickInviteCode(s.id!, invite.inviteCode)
+                      onClickInviteCode(s.id!, invite?.inviteCode ?? '')
                     }
                   >
                     <span className="tooltip rounded shadow-lg py-1 px-2 bg-black text-white -mt-6 text-sm">
-                      {clicked[s.id!] === true ? 'Copied!' : invite.inviteCode}
+                      {clicked[s.id!] === true
+                        ? 'Copied!'
+                        : invite?.inviteCode ?? 'Something went wrong!'}
                     </span>
                     {s.description}
                   </div>

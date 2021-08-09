@@ -88,9 +88,9 @@ const Play: React.FC = () => {
           />
         ) : tab === PlayTab.SIGN ? (
           <div className="flex-1">
-            <h1 className="font-bold text-2xl mb-2">Invite Code</h1>
+            <h1 className="font-bold text-2xl mb-2">Superpower Box Code</h1>
             <BingoInput
-              placeholder="Enter the invite code here"
+              placeholder="Enter the superpower box code here"
               value={inviteCode}
               onChange={onChangeInviteCode}
               className="p-4 text-xl mb-8"

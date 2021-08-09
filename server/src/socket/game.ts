@@ -1,6 +1,7 @@
 import {
   ERROR_CREATE_GAME,
-  ERROR_FETCH_GAME,
+  ERROR_FETCH_GAME_OWNER_CODE,
+  ERROR_FETCH_GAME_USER_TOKEN,
   ERROR_JOIN_GAME,
   ERROR_LEAVE_GAME,
   ERROR_START_GAME,
@@ -8,7 +9,8 @@ import {
   NOTIF_LEAVE_GAME,
   NOTIF_START_GAME,
   RES_CREATE_GAME,
-  RES_FETCH_GAME,
+  RES_FETCH_GAME_OWNER_CODE,
+  RES_FETCH_GAME_USER_TOKEN,
   RES_JOIN_GAME,
   RES_LEAVE_GAME,
   RES_START_GAME,
@@ -22,7 +24,8 @@ type JoinGameFunction = (data: {
   joinCode: string;
   name: string;
 }) => Promise<void>;
-type FetchGameFunction = (gameId: number) => Promise<void>;
+type FetchGameOwnerCodeFunction = (ownerCode: string) => Promise<void>;
+type FetchGameUserTokenFunction = (token: string) => Promise<void>;
 type LeaveGameFunction = (token: string) => Promise<void>;
 type StartGameFunction = (data: {
   gameId: number;
@@ -48,7 +51,7 @@ export const socketCreateGame = (
 };
 
 export const socketJoinGame = (
-  io: Server,
+  _io: Server,
   socket: Socket
 ): JoinGameFunction => {
   return async (data: { joinCode: string; name: string }): Promise<void> => {
@@ -69,20 +72,47 @@ export const socketJoinGame = (
   };
 };
 
-export const socketFetchGame = (
+export const socketFetchGameOwnerCode = (
   _io: Server,
   socket: Socket
-): FetchGameFunction => {
-  return async (gameId: number): Promise<void> => {
-    console.log('REQ_FETCH_GAME');
-    console.log('Game ID received: ', gameId);
+): FetchGameOwnerCodeFunction => {
+  return async (ownerString: string): Promise<void> => {
+    console.log('REQ_FETCH_GAME_OWNER_TOKEN');
+    console.log('Owner token received: ', ownerString);
 
     try {
-      const game = await GameController.fetchGame(gameId);
+      const { game, bingo, leaderboard } =
+        await GameController.fetchGameOwnerCode(ownerString);
       socket.join(`room-${game.id}`);
-      socket.emit(RES_FETCH_GAME, game);
+      socket.emit(RES_FETCH_GAME_OWNER_CODE, { game, bingo, leaderboard });
     } catch (error) {
-      socket.emit(ERROR_FETCH_GAME, error.message);
+      socket.emit(ERROR_FETCH_GAME_OWNER_CODE, error.message);
+    }
+  };
+};
+
+export const socketFetchGameUserToken = (
+  _io: Server,
+  socket: Socket
+): FetchGameUserTokenFunction => {
+  return async (token: string): Promise<void> => {
+    console.log('REQ_FETCH_GAME_OWNER_TOKEN');
+    console.log('Owner token received: ', token);
+
+    try {
+      const { game, bingo, leaderboard, user, invites } =
+        await GameController.fetchGameUserToken(token);
+      socket.join(`room-${game.id}`);
+      socket.emit(RES_FETCH_GAME_USER_TOKEN, {
+        game,
+        bingo,
+        leaderboard,
+        user,
+        invites,
+        token,
+      });
+    } catch (error) {
+      socket.emit(ERROR_FETCH_GAME_USER_TOKEN, error.message);
     }
   };
 };
@@ -116,12 +146,12 @@ export const socketStartGame = (
     console.log('Owner code received: ', data.ownerCode);
 
     try {
-      const updatedGame = await GameController.startGame(
+      const { game, bingo } = await GameController.startGame(
         data.gameId,
         data.ownerCode
       );
-      socket.emit(RES_START_GAME, updatedGame);
-      socket.to(`room-${updatedGame.id}`).emit(NOTIF_START_GAME, updatedGame);
+      socket.emit(RES_START_GAME, { game, bingo });
+      socket.to(`room-${game.id}`).emit(NOTIF_START_GAME, { game, bingo });
     } catch (error) {
       socket.emit(ERROR_START_GAME, error.message);
     }

@@ -5,36 +5,37 @@ import { useHistory } from 'react-router-dom';
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
 import Navbar from 'components/navbar';
-import { EDIT } from 'constants/routes';
+import { EDIT, GAME } from 'constants/routes';
 import { useSocket } from 'contexts/SocketContext';
 import { clearBingo } from 'reducers/bingoDux';
 import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
 import { fetchBingo } from 'services/bingoService';
+import { fetchGameOwnerCode } from 'services/gameService';
+import { callbackHandler } from 'utils/callbackHandler';
 
 const Start: React.FC = () => {
   const history = useHistory();
   const dispatch = useDispatch();
-  const lastFetched = useSelector(
-    (state: RootState) => state.bingo.lastFetched
-  );
-  const [previousLastFetch, setPreviousLastFetched] = useState(lastFetched);
   const isFetching = useSelector(
     (state: RootState) => state.misc.loading.isFetching
+  );
+  const ownerCode = useSelector(
+    (state: RootState) => state.bingo.bingo.ownerCode
   );
   const { socket } = useSocket();
   const [code, setCode] = useState('');
 
   useEffect(() => {
-    dispatch(clearBingo());
+    dispatch(updateLoadingState({ isFetching: false }));
   }, []);
 
   useEffect(() => {
-    if (lastFetched !== previousLastFetch) {
-      history.push(EDIT);
-      setPreviousLastFetched(lastFetched);
+    if (ownerCode != null) {
+      callbackHandler.fetchGameOwnerCodeCallback = () => history.push(GAME);
+      fetchGameOwnerCode(socket, ownerCode);
     }
-  }, [lastFetched]);
+  }, []);
 
   const onClickCreate = async () => {
     if (isFetching) return;
@@ -45,6 +46,9 @@ const Start: React.FC = () => {
   const onClickUpdate = async () => {
     if (isFetching || code.length < 6) return;
     dispatch(updateLoadingState({ isFetching: true }));
+    callbackHandler.fetchBingoCallback = () => {
+      history.push(EDIT);
+    };
     fetchBingo(socket, code);
   };
 

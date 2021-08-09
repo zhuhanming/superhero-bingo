@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import autosize from 'autosize';
 import { validateBingo } from 'shared';
@@ -27,26 +26,21 @@ import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
 import { createBingo, updateBingo } from 'services/bingoService';
 import { createGame } from 'services/gameService';
+import { callbackHandler } from 'utils/callbackHandler';
 import { sortByOrder } from 'utils/sortUtils';
 
 const Edit: React.FC = () => {
   const { bingo } = useSelector((state: RootState) => state.bingo);
-  const lastFetched = useSelector((state: RootState) => state.game.lastFetched);
-  const [previousLastFetch, setPreviousLastFetched] = useState(lastFetched);
   const { isSaving, isCreatingRoom } = useSelector(
     (state: RootState) => state.misc.loading
   );
   const dispatch = useDispatch();
   const { socket } = useSocket();
-  const history = useHistory();
   const superpowers = bingo.superpowers.slice().sort(sortByOrder);
 
   useEffect(() => {
-    if (lastFetched !== previousLastFetch) {
-      history.push(GAME);
-      setPreviousLastFetched(lastFetched);
-    }
-  }, [lastFetched]);
+    dispatch(updateLoadingState({ isSaving: false, isCreatingRoom: false }));
+  }, []);
 
   const onClickAdd = () => {
     dispatch(addBingoSuperpower());
@@ -74,6 +68,7 @@ const Edit: React.FC = () => {
       toast(error.message, { type: 'error' });
       return;
     }
+    callbackHandler.createGameCallback = () => window.open(GAME);
     dispatch(updateLoadingState({ isCreatingRoom: true }));
     dispatch(clearGame());
     updateBingo(socket, bingo);

@@ -3,12 +3,11 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
-import Navbar from 'components/navbar';
 import { SITE_URL } from 'constants/urls';
 import { useSocket } from 'contexts/SocketContext';
 import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
-import { fetchGame, startGame } from 'services/gameService';
+import { fetchGameOwnerCode, startGame } from 'services/gameService';
 
 import OngoingGame from './OngoingGame';
 
@@ -24,9 +23,13 @@ const Game: React.FC = () => {
   const { socket } = useSocket();
 
   useEffect(() => {
-    if (game.id !== -1) {
-      fetchGame(socket, game.id);
+    if (ownerCode !== '') {
+      fetchGameOwnerCode(socket, ownerCode);
     }
+  }, []);
+
+  useEffect(() => {
+    dispatch(updateLoadingState({ isStartingGame: false }));
   }, []);
 
   const onStartGame = () => {
@@ -44,12 +47,11 @@ const Game: React.FC = () => {
 
   return (
     <>
-      <Navbar />
       <main
         className="flex flex-col items-center"
         style={{ height: 'calc(100vh - 6rem)' }}
       >
-        <h1 className="font-bold text-3xl mt-8 mb-2 text-center">
+        <h1 className="font-bold text-3xl mt-16 mb-2 text-center">
           Join at {SITE_URL}
         </h1>
         <BingoInput
@@ -77,7 +79,7 @@ const Game: React.FC = () => {
         </div>
         <BingoButton
           text="Start Game!"
-          isDisabled={game.heroes.length < superpowers.length}
+          isDisabled={game.heroes.length < superpowers.length + 1}
           isLoading={isStartingGame}
           onClick={onStartGame}
           className="md:max-w-2xl p-4 bg-blue border-black border-8 mt-4"

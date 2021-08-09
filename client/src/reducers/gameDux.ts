@@ -9,8 +9,6 @@ export type DuxSuperhero = Superhero & {
 export interface GameDux {
   game: Game;
   self: DuxSuperhero;
-  isOwner: boolean;
-  lastFetched: number;
   leaderboard: { [heroId: number]: number };
   invitations: Invite[];
   inviteToSign?: Invite;
@@ -31,8 +29,6 @@ const initialState: GameDux = {
     gameId: -1,
     token: '',
   },
-  isOwner: false,
-  lastFetched: Date.now(),
   leaderboard: {},
   invitations: [],
   inviteToSign: undefined,
@@ -45,7 +41,6 @@ const game = createSlice({
   reducers: {
     setGame: (state, action: PayloadAction<Game>): void => {
       state.game = action.payload;
-      state.lastFetched = Date.now();
     },
     addSuperhero: (state, action: PayloadAction<Superhero>): void => {
       const superheroes = state.game.heroes.slice();
@@ -61,14 +56,17 @@ const game = createSlice({
       delete leaderboard[action.payload];
       state.leaderboard = leaderboard;
     },
+    setLeaderboard: (
+      state,
+      action: PayloadAction<{ [id: number]: number }>
+    ): void => {
+      state.leaderboard = action.payload;
+    },
     updateSuperheroScore: (
       state,
       action: PayloadAction<{ superheroId: number; score: number }>
     ): void => {
       state.leaderboard[action.payload.superheroId] = action.payload.score;
-    },
-    setIsOwner: (state, action: PayloadAction<boolean>): void => {
-      state.isOwner = action.payload;
     },
     setSelf: (state, action: PayloadAction<DuxSuperhero>): void => {
       state.self = action.payload;
@@ -137,9 +135,9 @@ export const {
   setGame,
   addSuperhero,
   removeSuperhero,
+  setLeaderboard,
   updateSuperheroScore,
   setSelf,
-  setIsOwner,
   setInvitations,
   trySignInvitation,
   setInviteToSign,

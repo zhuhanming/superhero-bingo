@@ -68,4 +68,4 @@ jobs:
             cp package.json ./build/
             cd build
             yarn install
-            pm2 start npm --name "superhero-bingo" -- run production
+            pm2 start npm --log-date-format="YYYY-MM-DD HH:mm Z" --name "superhero-bingo" -- run production

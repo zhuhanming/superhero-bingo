@@ -18,6 +18,7 @@ import { Socket } from 'socket.io-client';
 import store from 'app/store';
 import { setBingo } from 'reducers/bingoDux';
 import { updateLoadingState } from 'reducers/miscDux';
+import { callbackHandler, emptyFunction } from 'utils/callbackHandler';
 
 export const fetchBingo = (socket: Socket, ownerCode: string): void => {
   socket.emit(REQ_FETCH_BINGO, ownerCode);
@@ -26,7 +27,9 @@ export const fetchBingo = (socket: Socket, ownerCode: string): void => {
 const receivedBingo = (socket: Socket): void => {
   socket.on(RES_FETCH_BINGO, (payload: CreatedBingo) => {
     store.dispatch(updateLoadingState({ isFetching: false }));
-    store.dispatch(setBingo(payload));
+    store.dispatch(setBingo({ bingo: payload, isOwner: true }));
+    callbackHandler.fetchBingoCallback();
+    callbackHandler.fetchBingoCallback = emptyFunction;
   });
 };
 
@@ -34,6 +37,7 @@ const errorFetchBingo = (socket: Socket): void => {
   socket.on(ERROR_FETCH_BINGO, (payload: string) => {
     store.dispatch(updateLoadingState({ isFetching: false }));
     toast(payload, { type: 'error' });
+    callbackHandler.fetchBingoCallback = emptyFunction;
   });
 };
 
@@ -44,7 +48,7 @@ export const createBingo = (socket: Socket, bingo: Bingo): void => {
 const createdBingo = (socket: Socket): void => {
   socket.on(RES_CREATE_BINGO, (payload: CreatedBingo) => {
     store.dispatch(updateLoadingState({ isSaving: false }));
-    store.dispatch(setBingo(payload));
+    store.dispatch(setBingo({ bingo: payload, isOwner: true }));
     toast('Successfully saved bingo!', { type: 'success' });
   });
 };
@@ -63,7 +67,7 @@ export const updateBingo = (socket: Socket, bingo: UpdatedBingo): void => {
 const updatedBingo = (socket: Socket): void => {
   socket.on(RES_UPDATE_BINGO, (payload: CreatedBingo) => {
     store.dispatch(updateLoadingState({ isSaving: false }));
-    store.dispatch(setBingo(payload));
+    store.dispatch(setBingo({ bingo: payload, isOwner: true }));
     toast('Successfully updated bingo!', { type: 'success' });
   });
 };

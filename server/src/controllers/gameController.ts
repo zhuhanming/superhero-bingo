@@ -131,19 +131,145 @@ export const joinGame = async (
   return { game, bingo, user, token, invites };
 };
 
-export const fetchGame = async (gameId: number): Promise<Game> => {
-  const game = await prisma.game.findUnique({
+export const fetchGameOwnerCode = async (
+  ownerCode: string
+): Promise<{
+  game: Game;
+  bingo: CreatedBingo;
+  leaderboard: { [id: number]: number };
+}> => {
+  const bingo = await prisma.bingo.findUnique({
     where: {
-      id: gameId,
+      ownerCode,
+    },
+    include: {
+      superpowers: true,
+    },
+  });
+  if (bingo == null) {
+    throw new Error('Invalid owner code!');
+  }
+  const game = await prisma.game.findFirst({
+    where: {
+      bingoId: bingo.id,
+      hasEnded: false,
     },
     include: {
       heroes: true,
     },
   });
   if (game === null) {
-    throw new Error('Invalid game ID provided!');
+    throw new Error('No ongoing game for bingo with provided owner code!');
   }
-  return game;
+  const superheroes = await prisma.superhero.findMany({
+    where: {
+      gameId: game.id,
+    },
+    include: {
+      pairings: true,
+    },
+  });
+
+  const leaderboard = superheroes.reduce((acc: { [id: number]: number }, s) => {
+    acc[s.id] = s.pairings.length;
+    return acc;
+  }, {});
+
+  return { game, bingo, leaderboard };
+};
+
+export const fetchGameUserToken = async (
+  token: string
+): Promise<{
+  game: Game;
+  bingo: CreatedBingo;
+  user: Superhero;
+  token: string;
+  invites: Invite[];
+  leaderboard: { [id: number]: number };
+}> => {
+  let payload;
+  try {
+    payload = verify(token, process.env.JWT_SECRET!);
+    if (typeof payload !== 'object') {
+      throw new Error();
+    }
+  } catch (error) {
+    throw new Error('Invalid token provided!');
+  }
+  const user = await prisma.superhero.findUnique({
+    where: {
+      id: payload.userId,
+    },
+  });
+  if (user == null) {
+    throw new Error('No such user exists!');
+  }
+  const game = await prisma.game.findFirst({
+    where: {
+      id: user.gameId,
+      hasEnded: false,
+    },
+    include: {
+      heroes: true,
+    },
+  });
+  if (game == null) {
+    throw new Error('Game has already completed!');
+  }
+  const bingo = await prisma.bingo.findUnique({
+    where: {
+      id: game.bingoId,
+    },
+    include: {
+      superpowers: true,
+    },
+  });
+  if (bingo == null) {
+    throw new Error('Invalid bingo!');
+  }
+  const superheroes = await prisma.superhero.findMany({
+    where: {
+      gameId: game.id,
+    },
+    include: {
+      pairings: true,
+    },
+  });
+
+  const leaderboard = superheroes.reduce((acc: { [id: number]: number }, s) => {
+    acc[s.id] = s.pairings.length;
+    return acc;
+  }, {});
+
+  const queriedInvites = await prisma.heroPowerPairingInvites.findMany({
+    where: {
+      ownerId: payload.userId,
+    },
+    include: {
+      superpower: true,
+      owner: true,
+    },
+  });
+  const pairings = await prisma.heroPowerPairing.findMany({
+    where: {
+      ownerId: payload.userId,
+    },
+    include: {
+      signee: true,
+    },
+  });
+
+  const invites: Invite[] = queriedInvites.map((i) => ({
+    ...i,
+    superpowerDescription: i.superpower.description,
+    ownerName: i.owner.name,
+    signeeId: pairings.find((p) => p.superpowerId === i.superpowerId)?.signeeId,
+    signeeName: pairings.find((p) => p.superpowerId === i.superpowerId)?.signee
+      .name,
+  }));
+
+  return { game, bingo, user, token, leaderboard, invites };
 };
 
 // Returns the game ID so that the socket can broadcast this message.
@@ -185,7 +311,7 @@ export const leaveGame = async (
 export const startGame = async (
   gameId: number,
   ownerCode: string
-): Promise<Game> => {
+): Promise<{ game: Game; bingo: CreatedBingo }> => {
   const game = await prisma.game.findUnique({
     where: {
       id: gameId,
@@ -214,5 +340,16 @@ export const startGame = async (
       heroes: true,
     },
   });
-  return updatedGame;
+  const bingo = await prisma.bingo.findUnique({
+    where: {
+      id: updatedGame.bingoId,
+    },
+    include: {
+      superpowers: true,
+    },
+  });
+  if (bingo == null) {
+    throw new Error('The bingo seems to have been deleted!');
+  }
+  return { game: updatedGame, bingo };
 };

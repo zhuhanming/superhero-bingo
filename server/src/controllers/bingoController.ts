@@ -30,6 +30,17 @@ export const updateBingo = async (
 ): Promise<CreatedBingo> => {
   validateBingo(bingoData);
 
+  const numActiveGames = await prisma.game.count({
+    where: {
+      bingoId: bingoData.id,
+      hasStarted: true,
+      hasEnded: false,
+    },
+  });
+  if (numActiveGames > 0) {
+    throw new Error('You cannot edit the bingo while a game is ongoing!');
+  }
+
   // Update existing superpowers
   await Promise.all(
     bingoData.superpowers

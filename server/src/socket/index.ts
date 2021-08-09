@@ -3,7 +3,8 @@ import {
   REQ_CREATE_BINGO,
   REQ_CREATE_GAME,
   REQ_FETCH_BINGO,
-  REQ_FETCH_GAME,
+  REQ_FETCH_GAME_OWNER_CODE,
+  REQ_FETCH_GAME_USER_TOKEN,
   REQ_FETCH_INVITE,
   REQ_JOIN_GAME,
   REQ_LEAVE_GAME,
@@ -30,7 +31,14 @@ const setUpIo = (io: Server): void => {
     // Game handlers
     socket.on(REQ_CREATE_GAME, GameHandler.socketCreateGame(io, socket));
     socket.on(REQ_JOIN_GAME, GameHandler.socketJoinGame(io, socket));
-    socket.on(REQ_FETCH_GAME, GameHandler.socketFetchGame(io, socket));
+    socket.on(
+      REQ_FETCH_GAME_OWNER_CODE,
+      GameHandler.socketFetchGameOwnerCode(io, socket)
+    );
+    socket.on(
+      REQ_FETCH_GAME_USER_TOKEN,
+      GameHandler.socketFetchGameUserToken(io, socket)
+    );
     socket.on(REQ_LEAVE_GAME, GameHandler.socketLeaveGame(io, socket));
     socket.on(REQ_START_GAME, GameHandler.socketStartGame(io, socket));
 

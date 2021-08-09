@@ -15,7 +15,6 @@ type DuxBingo = Omit<UpdatedBingo, 'superpowers'> & {
 
 export interface BingoDux {
   bingo: DuxBingo;
-  lastFetched: number;
 }
 
 const initialState: BingoDux = {
@@ -25,7 +24,6 @@ const initialState: BingoDux = {
     ownerCode: '',
     superpowers: [],
   },
-  lastFetched: Date.now(),
 };
 
 // Contains user information, theme, view selected and fun fact of the day
@@ -94,14 +92,20 @@ const bingo = createSlice({
       state.bingo.superpowers = superpowersCopy;
     },
     // Used after fetching the bingo from the server
-    setBingo: (state, action: PayloadAction<CreatedBingo>): void => {
-      const superpowers = action.payload.superpowers.map((s) => ({
+    setBingo: (
+      state,
+      action: PayloadAction<{ bingo: CreatedBingo; isOwner: boolean }>
+    ): void => {
+      const superpowers = action.payload.bingo.superpowers.map((s) => ({
         ...s,
         uniqueId: `superpower-${s.order}`,
       }));
-      const bingo = { ...action.payload, superpowers };
+      const bingo = {
+        ...action.payload.bingo,
+        superpowers,
+        ownerCode: action.payload.isOwner ? action.payload.bingo.ownerCode : '',
+      };
       state.bingo = bingo;
-      state.lastFetched = Date.now();
     },
     clearBingo: (state): void => {
       state.bingo = {
