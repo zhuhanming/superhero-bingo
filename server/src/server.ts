@@ -5,9 +5,8 @@ import { createServer, Server } from 'http';
 import morgan from 'morgan';
 import { Server as SocketServer } from 'socket.io';
 
-import setUpIo from 'socket';
-
 import routes from './routes';
+import setUpIo from './socket';
 
 const corsOptions: CorsOptions = {
   // TODO: Fix the production URL once deployed

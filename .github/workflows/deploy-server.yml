@@ -54,11 +54,12 @@ jobs:
             cd ../..
             rm -rf server
             cd ../..
-            pm2 stop ecosystem.config.js --only superhero-bingo
+            pm2 stop superhero-bingo
+            pm2 delete superhero-bingo
             yarn migrate
-            cp ecosystem.config.js ./server/build/
             cd server
             cp .env ./build/
             cp package.json ./build/
             cd build
-            pm2 restart ecosystem.config.js --only superhero-bingo --log-date-format="YYYY-MM-DD HH:mm Z"
+            yarn install
+            pm2 start npm --name "superhero-bingo" -- run production
