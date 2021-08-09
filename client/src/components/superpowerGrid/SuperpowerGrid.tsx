@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useEffect, useState } from 'react';
 import autosize from 'autosize';
-import { Invite, Superhero } from 'shared';
+import { Invite } from 'shared';
 
 import { MAX_DESCRIPTION_LENGTH } from 'constants/text';
 import { DuxSuperpower } from 'reducers/bingoDux';
