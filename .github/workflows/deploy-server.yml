@@ -1,0 +1,62 @@
+name: Deploy Server via SSH
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+      - uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - name: Install dependencies
+        run: yarn install
+      - name: Build application
+        run: yarn server build
+      - name: Copy /build folder to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          rm: true
+          source: "server/build/"
+          target: "${{ secrets.REMOTE_DIR }}/server/build"
+      - name: Pull latest repository
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.REMOTE_HOST }}
+          username: ${{ secrets.REMOTE_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          script: |
+            cd ${{ secrets.REMOTE_DIR }}
+            git checkout master
+            git pull
+            git reset --hard origin/master
+            yarn install
+            cd server/build/build
+            mv * ..
+            cd ..
+            rm -rf build
+            cd ../..
+            pm2 stop ecosystem.config.js --only superhero-bingo
+            yarn migrate
+            cd server
+            cp .env ./build/
+            cp ../ecosystem.config.js ./build/
+            cp package.json ./build/
+            cd build
+            pm2 restart ecosystem.config.js --only superhero-bingo --log-date-format="YYYY-MM-DD HH:mm Z"
+            pm2 logs --nostream
