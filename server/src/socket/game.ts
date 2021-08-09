@@ -126,8 +126,11 @@ export const socketLeaveGame = (
     console.log('Token received: ', token);
 
     try {
-      const { gameId, superheroId } = await GameController.leaveGame(token);
-      socket.to(`room-${gameId}`).emit(NOTIF_LEAVE_GAME, superheroId);
+      const { gameId, superheroId, leaderboard } =
+        await GameController.leaveGame(token);
+      socket
+        .to(`room-${gameId}`)
+        .emit(NOTIF_LEAVE_GAME, { superheroId, leaderboard });
       socket.leave(`room-${gameId}`);
       socket.emit(RES_LEAVE_GAME);
     } catch (error) {

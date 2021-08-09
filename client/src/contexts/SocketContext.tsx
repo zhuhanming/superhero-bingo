@@ -22,10 +22,10 @@ const SocketProvider: React.FunctionComponent = (props) => {
   });
 
   useEffect(() => {
+    initializeSocket(socket);
     socket.on(CONNECT, () => {
       // eslint-disable-next-line no-console
       console.log('Socket connected!');
-      initializeSocket(socket);
     });
     socket.on('connect_error', (err) => {
       // eslint-disable-next-line no-console

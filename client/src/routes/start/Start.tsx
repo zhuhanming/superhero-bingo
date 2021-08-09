@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import { NUM_CHARS_OWNER_CODE } from 'shared';
 
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
@@ -54,7 +55,7 @@ const Start: React.FC = () => {
 
   const onUpdateCode = (newCode: string) => {
     if (
-      newCode.length > 6 ||
+      newCode.length > NUM_CHARS_OWNER_CODE ||
       (newCode.length > 0 && !newCode.match(/^[0-9a-zA-Z]+$/))
     ) {
       return;

@@ -66,16 +66,19 @@ const Game: React.FC = () => {
         <h1 className="font-bold text-3xl mt-8 mb-2">
           Superheroes ({game.heroes.length})
         </h1>
-        <div className="flex flex-1 flex-row-reverse flex-wrap w-full justify-center overflow-scroll">
+        <div className="flex flex-1 flex-wrap w-full justify-center overflow-scroll">
           {game.heroes.length === 0 && 'Waiting for heroes to join!'}
-          {game.heroes.map((hero) => (
-            <div
-              className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 font-bold text-center text-2xl p-4 text-red mb-2"
-              key={`hero-${hero.id}`}
-            >
-              {hero.name}
-            </div>
-          ))}
+          {game.heroes
+            .slice()
+            .reverse()
+            .map((hero) => (
+              <div
+                className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 font-bold text-center text-2xl p-4 text-red mb-2 flex justify-center items-center"
+                key={`hero-${hero.id}`}
+              >
+                {hero.name}
+              </div>
+            ))}
         </div>
         <BingoButton
           text="Start Game!"

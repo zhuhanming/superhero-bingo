@@ -36,6 +36,7 @@ module.exports = {
         DEFAULT: '#ffffff',
       },
       gray: {
+        500: '#6B7280',
         DEFAULT: '#E5E7EB',
       },
     },

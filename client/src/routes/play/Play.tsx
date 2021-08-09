@@ -1,16 +1,20 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
 import Leaderboard from 'components/leaderboard';
 import SuperpowerGrid from 'components/superpowerGrid';
+import { JOIN } from 'constants/routes';
 import { useSocket } from 'contexts/SocketContext';
 import { clearInviteToSign } from 'reducers/gameDux';
 import { RootState } from 'reducers/rootReducer';
+import { fetchGameUserToken, leaveGame } from 'services/gameService';
 import { fetchInvite, signInvite } from 'services/inviteService';
+import { callbackHandler } from 'utils/callbackHandler';
 
 enum PlayTab {
   LEADERBOARD,
@@ -26,6 +30,13 @@ const Play: React.FC = () => {
   const [inviteCode, setInviteCode] = useState('');
   const { socket } = useSocket();
   const dispatch = useDispatch();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (self.token != null) {
+      fetchGameUserToken(socket, self.token);
+    }
+  }, []);
 
   const onChangeInviteCode = (newCode: string) => {
     if (
@@ -48,6 +59,17 @@ const Play: React.FC = () => {
     signInvite(socket, inviteToSign.inviteCode, self.token);
   };
 
+  const onClickLeaveGame = () => {
+    // eslint-disable-next-line no-alert
+    const confirm = window.confirm(
+      "Are you sure you wish to leave the game? You won't be able to join back."
+    );
+    if (confirm) {
+      callbackHandler.leaveGameCallback = () => history.push(JOIN);
+      leaveGame(socket, self.token);
+    }
+  };
+
   return (
     <main className="flex pt-8" style={{ height: 'calc(100vh - 3rem)' }}>
       <div className="hidden md:block mr-8" style={{ flex: 3 }}>
@@ -62,7 +84,7 @@ const Play: React.FC = () => {
         <div className="flex">
           <h1
             className={`font-bold text-2xl mb-4 cursor-pointer ${
-              tab === PlayTab.LEADERBOARD ? 'text-black' : 'text-gray'
+              tab === PlayTab.LEADERBOARD ? 'text-black' : 'text-gray-500'
             }`}
             onClick={() => setTab(PlayTab.LEADERBOARD)}
             onKeyDown={() => setTab(PlayTab.LEADERBOARD)}
@@ -71,7 +93,7 @@ const Play: React.FC = () => {
           </h1>
           <h1
             className={`font-bold text-2xl mb-4 ml-8 cursor-pointer ${
-              tab === PlayTab.SIGN ? 'text-black' : 'text-gray'
+              tab === PlayTab.SIGN ? 'text-black' : 'text-gray-500'
             }`}
             onClick={() => setTab(PlayTab.SIGN)}
             onKeyDown={() => setTab(PlayTab.SIGN)}
@@ -80,12 +102,19 @@ const Play: React.FC = () => {
           </h1>
         </div>
         {tab === PlayTab.LEADERBOARD ? (
-          <Leaderboard
-            superheroes={game.heroes}
-            leaderboard={leaderboard}
-            numSuperpowers={bingo.superpowers.length}
-            className="flex-1 overflow-scroll"
-          />
+          <>
+            <Leaderboard
+              superheroes={game.heroes}
+              leaderboard={leaderboard}
+              numSuperpowers={bingo.superpowers.length}
+              className="flex-1 overflow-scroll"
+            />
+            <BingoButton
+              text="Leave Game"
+              onClick={onClickLeaveGame}
+              className="text-lg p-2 bg-red border-black border-4 mt-4"
+            />
+          </>
         ) : tab === PlayTab.SIGN ? (
           <div className="flex-1">
             <h1 className="font-bold text-2xl mb-2">Superpower Box Code</h1>
@@ -118,7 +147,7 @@ const Play: React.FC = () => {
               text="Sign Superpower!"
               isDisabled={inviteToSign == null}
               onClick={onClickSign}
-              className="text-lg p-2 bg-red border-black border-4 mt-2"
+              className="text-lg p-2 bg-blue border-black border-4 mt-2"
             />
           </div>
         ) : null}

@@ -101,7 +101,7 @@ const game = createSlice({
     setInviteToSign: (state, action: PayloadAction<Invite>): void => {
       state.inviteToSign = action.payload;
     },
-    clearGame: (state): void => {
+    clearGameDux: (state): void => {
       state.game = {
         id: -1,
         joinCode: '',
@@ -110,20 +110,18 @@ const game = createSlice({
         hasEnded: false,
         heroes: [],
       };
-    },
-    clearSelf: (state): void => {
       state.self = {
         id: -1,
         name: '',
         gameId: -1,
         token: '',
       };
+      state.leaderboard = {};
+      state.invitations = [];
+      state.inviteToSign = undefined;
     },
     clearLeaderboard: (state): void => {
       state.leaderboard = {};
-    },
-    clearInvitations: (state): void => {
-      state.invitations = [];
     },
     clearInviteToSign: (state): void => {
       state.inviteToSign = undefined;
@@ -141,10 +139,8 @@ export const {
   setInvitations,
   trySignInvitation,
   setInviteToSign,
-  clearGame,
-  clearSelf,
+  clearGameDux,
   clearLeaderboard,
-  clearInvitations,
   clearInviteToSign,
 } = game.actions;
 

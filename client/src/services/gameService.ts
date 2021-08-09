@@ -32,9 +32,8 @@ import store from 'app/store';
 import { clearBingo, setBingo } from 'reducers/bingoDux';
 import {
   addSuperhero,
-  clearGame,
+  clearGameDux,
   clearLeaderboard,
-  clearSelf,
   removeSuperhero,
   setGame,
   setInvitations,
@@ -128,8 +127,7 @@ const fetchedGameOwnerCode = (socket: Socket): void => {
 
 const onErrorFetchGameOwnerCode = (socket: Socket): void => {
   socket.on(ERROR_FETCH_GAME_OWNER_CODE, () => {
-    store.dispatch(clearGame());
-    store.dispatch(clearBingo());
+    store.dispatch(clearGameDux());
     callbackHandler.fetchGameOwnerCodeCallback = emptyFunction;
   });
 };
@@ -162,9 +160,8 @@ const fetchedGameUserToken = (socket: Socket): void => {
 
 const onErrorFetchGameUserToken = (socket: Socket): void => {
   socket.on(ERROR_FETCH_GAME_USER_TOKEN, () => {
-    store.dispatch(clearGame());
     store.dispatch(clearBingo());
-    store.dispatch(clearSelf());
+    store.dispatch(clearGameDux());
     callbackHandler.fetchGameUserTokenCallback = emptyFunction;
   });
 };
@@ -176,23 +173,31 @@ export const leaveGame = (socket: Socket, token: string): void => {
 const leftGame = (socket: Socket): void => {
   socket.on(RES_LEAVE_GAME, () => {
     store.dispatch(clearBingo());
-    store.dispatch(clearGame());
-    store.dispatch(clearSelf());
-    store.dispatch(clearLeaderboard());
+    store.dispatch(clearGameDux());
     toast('Left the game.', { type: 'success' });
+    callbackHandler.leaveGameCallback();
+    callbackHandler.leaveGameCallback = emptyFunction;
   });
 };
 
 const onErrorLeaveGame = (socket: Socket): void => {
   socket.on(ERROR_LEAVE_GAME, (payload: string) => {
     toast(payload, { type: 'error' });
+    callbackHandler.leaveGameCallback = emptyFunction;
   });
 };
 
 const onNotifLeaveGame = (socket: Socket): void => {
-  socket.on(NOTIF_LEAVE_GAME, (payload: number) => {
-    store.dispatch(removeSuperhero(payload));
-  });
+  socket.on(
+    NOTIF_LEAVE_GAME,
+    (payload: {
+      superheroId: number;
+      leaderboard: { [id: number]: number };
+    }) => {
+      store.dispatch(removeSuperhero(payload.superheroId));
+      store.dispatch(setLeaderboard(payload.leaderboard));
+    }
+  );
 };
 
 export const startGame = (

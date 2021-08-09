@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import autosize from 'autosize';
-import { validateBingo } from 'shared';
+import { NUM_CHARS_OWNER_CODE, validateBingo } from 'shared';
 import { v4 as uuidv4 } from 'uuid';
 
 import BingoButton from 'components/bingoButton';
@@ -21,7 +21,7 @@ import {
   updateBingoSuperpower,
   updateBingoSuperpowers,
 } from 'reducers/bingoDux';
-import { clearGame } from 'reducers/gameDux';
+import { clearGameDux } from 'reducers/gameDux';
 import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
 import { createBingo, updateBingo } from 'services/bingoService';
@@ -54,7 +54,7 @@ const Edit: React.FC = () => {
       return;
     }
     dispatch(updateLoadingState({ isSaving: true }));
-    if (bingo.ownerCode.length === 6) {
+    if (bingo.ownerCode.length === NUM_CHARS_OWNER_CODE) {
       updateBingo(socket, bingo);
     } else {
       createBingo(socket, bingo);
@@ -70,7 +70,7 @@ const Edit: React.FC = () => {
     }
     callbackHandler.createGameCallback = () => window.open(GAME);
     dispatch(updateLoadingState({ isCreatingRoom: true }));
-    dispatch(clearGame());
+    dispatch(clearGameDux());
     updateBingo(socket, bingo);
     createGame(socket, bingo.ownerCode);
   };

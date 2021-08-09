@@ -1,13 +1,17 @@
-import { Bingo, CreatedBingo, UpdatedBingo, validateBingo } from 'shared';
+import {
+  Bingo,
+  CreatedBingo,
+  NUM_CHARS_OWNER_CODE,
+  UpdatedBingo,
+  validateBingo,
+} from 'shared';
 
 import prisma from 'lib/prisma';
 import { makeCode } from 'utils/codeUtils';
 
-const OWNER_CODE_LENGTH = 6;
-
 export const createBingo = async (bingoData: Bingo): Promise<CreatedBingo> => {
   validateBingo(bingoData);
-  const ownerCode = makeCode(OWNER_CODE_LENGTH);
+  const ownerCode = makeCode(NUM_CHARS_OWNER_CODE);
   return await prisma.bingo.create({
     data: {
       name: bingoData.name,

@@ -1,11 +1,15 @@
 import { sign, verify } from 'jsonwebtoken';
-import { CreatedBingo, Game, Invite, Superhero } from 'shared';
+import {
+  CreatedBingo,
+  Game,
+  Invite,
+  NUM_CHARS_JOIN_CODE,
+  NUM_CHARS_SUPERPOWER_BOX_CODE,
+  Superhero,
+} from 'shared';
 
 import prisma from 'lib/prisma';
 import { makeCode } from 'utils/codeUtils';
-
-const JOIN_CODE_LENGTH = 6;
-const INVITE_CODE_LENGTH = 8;
 
 export const createGame = async (ownerCode: string): Promise<Game> => {
   const bingo = await prisma.bingo.findUnique({
@@ -27,7 +31,7 @@ export const createGame = async (ownerCode: string): Promise<Game> => {
     throw new Error('There is already an ongoing game!');
   }
 
-  const joinCode = makeCode(JOIN_CODE_LENGTH);
+  const joinCode = makeCode(NUM_CHARS_JOIN_CODE);
   return await prisma.game.create({
     data: {
       bingoId: bingo.id,
@@ -98,7 +102,7 @@ export const joinGame = async (
 
   const createdInvites = await Promise.all(
     bingo.superpowers.map((s) => {
-      const inviteCode = makeCode(INVITE_CODE_LENGTH);
+      const inviteCode = makeCode(NUM_CHARS_SUPERPOWER_BOX_CODE);
       return prisma.heroPowerPairingInvites.create({
         data: {
           superpowerId: s.id,
@@ -275,7 +279,11 @@ export const fetchGameUserToken = async (
 // Returns the game ID so that the socket can broadcast this message.
 export const leaveGame = async (
   token: string
-): Promise<{ gameId: number; superheroId: number }> => {
+): Promise<{
+  gameId: number;
+  superheroId: number;
+  leaderboard: { [id: number]: number };
+}> => {
   let payload;
   try {
     payload = verify(token, process.env.JWT_SECRET!);
@@ -305,7 +313,21 @@ export const leaveGame = async (
     },
   });
 
-  return { gameId: payload.gameId, superheroId: payload.userId };
+  const superheroes = await prisma.superhero.findMany({
+    where: {
+      gameId: payload.gameId,
+    },
+    include: {
+      pairings: true,
+    },
+  });
+
+  const leaderboard = superheroes.reduce((acc: { [id: number]: number }, s) => {
+    acc[s.id] = s.pairings.length;
+    return acc;
+  }, {});
+
+  return { gameId: payload.gameId, superheroId: payload.userId, leaderboard };
 };
 
 export const startGame = async (
@@ -335,6 +357,7 @@ export const startGame = async (
     },
     data: {
       hasStarted: true,
+      startedAt: new Date(),
     },
     include: {
       heroes: true,
