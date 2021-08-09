@@ -9,8 +9,10 @@ import routes from './routes';
 import setUpIo from './socket';
 
 const corsOptions: CorsOptions = {
-  // TODO: Fix the production URL once deployed
-  origin: process.env.NODE_ENV === 'production' ? /.*netlify\.app.*/ : '*',
+  origin:
+    process.env.NODE_ENV === 'production'
+      ? /.*superhero-bingo\.netlify\.app.*/
+      : '*',
 };
 
 export class ApiServer {
