@@ -13,6 +13,7 @@ export interface GameDux {
   lastFetched: number;
   leaderboard: { [heroId: number]: number };
   invitations: Invite[];
+  inviteToSign?: Invite;
 }
 
 const initialState: GameDux = {
@@ -34,6 +35,7 @@ const initialState: GameDux = {
   lastFetched: Date.now(),
   leaderboard: {},
   invitations: [],
+  inviteToSign: undefined,
 };
 
 // Contains user information, theme, view selected and fun fact of the day
@@ -90,6 +92,9 @@ const game = createSlice({
       );
       state.invitations = [...restOfInvitations, { ...invitation, signeeId }];
     },
+    setInviteToSign: (state, action: PayloadAction<Invite>): void => {
+      state.inviteToSign = action.payload;
+    },
     clearGame: (state): void => {
       state.game = {
         id: -1,
@@ -114,6 +119,9 @@ const game = createSlice({
     clearInvitations: (state): void => {
       state.invitations = [];
     },
+    clearInviteToSign: (state): void => {
+      state.inviteToSign = undefined;
+    },
   },
 });
 
@@ -126,6 +134,7 @@ export const {
   setIsOwner,
   setInvitations,
   signInvitation,
+  setInviteToSign,
   clearGame,
   clearSelf,
   clearLeaderboard,

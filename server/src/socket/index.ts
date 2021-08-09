@@ -4,6 +4,7 @@ import {
   REQ_CREATE_GAME,
   REQ_FETCH_BINGO,
   REQ_FETCH_GAME,
+  REQ_FETCH_INVITE,
   REQ_JOIN_GAME,
   REQ_LEAVE_GAME,
   REQ_START_GAME,
@@ -14,6 +15,7 @@ import { Server } from 'socket.io';
 
 import * as BingoHandler from './bingo';
 import * as GameHandler from './game';
+import * as InviteHandler from './invite';
 
 const setUpIo = (io: Server): void => {
   io.on(CONNECT, (socket) => {
@@ -30,6 +32,9 @@ const setUpIo = (io: Server): void => {
     socket.on(REQ_FETCH_GAME, GameHandler.socketFetchGame(io, socket));
     socket.on(REQ_LEAVE_GAME, GameHandler.socketLeaveGame(io, socket));
     socket.on(REQ_START_GAME, GameHandler.socketStartGame(io, socket));
+
+    // Invite handlers
+    socket.on(REQ_FETCH_INVITE, InviteHandler.socketFetchInvite(io, socket));
 
     socket.on(SOCKET_DISCONNECT, () => {
       // TODO: Clean up

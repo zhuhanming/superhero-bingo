@@ -17,7 +17,7 @@ const BingoInput: React.FC<Props> = ({
 }) => {
   return (
     <input
-      className={`w-full rounded-xl font-medium ${
+      className={`w-full rounded-xl font-medium outline-none ${
         isDisabled ? 'bg-gray' : ''
       } ${className}`}
       placeholder={placeholder}

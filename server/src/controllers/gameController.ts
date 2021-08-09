@@ -96,7 +96,7 @@ export const joinGame = async (
   });
   game.heroes.push(user);
 
-  const invites = await Promise.all(
+  const createdInvites = await Promise.all(
     bingo.superpowers.map((s) => {
       const inviteCode = makeCode(INVITE_CODE_LENGTH);
       return prisma.heroPowerPairingInvites.create({
@@ -105,9 +105,19 @@ export const joinGame = async (
           ownerId: user.id,
           inviteCode,
         },
+        include: {
+          owner: true,
+          superpower: true,
+        },
       });
     })
   );
+
+  const invites: Invite[] = createdInvites.map((i) => ({
+    ...i,
+    superpowerDescription: i.superpower.description,
+    ownerName: i.owner.name,
+  }));
 
   const tokenPayload = {
     userId: user.id,

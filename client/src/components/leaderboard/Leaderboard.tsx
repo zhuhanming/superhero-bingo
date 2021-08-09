@@ -19,9 +19,9 @@ const Leaderboard: React.FC<Props> = ({
       {superheroes.map((s) => (
         <div
           key={`leaderboard-superhero-${s.id}`}
-          className="flex justify-between items-center bg-gray mb-2 p-2 rounded-lg border-black border-4"
+          className="flex justify-between items-center bg-gray mb-2 p-4 rounded-lg border-black border-4"
         >
-          <div className="font-medium text-lg">{s.name}</div>
+          <div className="font-medium text-xl">{s.name}</div>
           <div className="font-regular">
             {leaderboard[s.id] ?? 0} / {numSuperpowers}
           </div>

@@ -1,10 +1,15 @@
+/* eslint-disable no-nested-ternary */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 
+import BingoButton from 'components/bingoButton';
+import BingoInput from 'components/bingoInput';
 import Leaderboard from 'components/leaderboard';
 import SuperpowerGrid from 'components/superpowerGrid';
+import { useSocket } from 'contexts/SocketContext';
 import { RootState } from 'reducers/rootReducer';
+import { fetchInvite } from 'services/inviteService';
 
 enum PlayTab {
   LEADERBOARD,
@@ -14,9 +19,28 @@ enum PlayTab {
 const Play: React.FC = () => {
   const bingo = useSelector((state: RootState) => state.bingo.bingo);
   const [tab, setTab] = useState(PlayTab.LEADERBOARD);
-  const { game, leaderboard, invitations } = useSelector(
+  const { game, leaderboard, invitations, inviteToSign } = useSelector(
     (state: RootState) => state.game
   );
+  const [inviteCode, setInviteCode] = useState('');
+  const { socket } = useSocket();
+
+  const onChangeInviteCode = (newCode: string) => {
+    if (
+      newCode.length > 8 ||
+      (newCode.length > 0 && !newCode.match(/^[0-9a-zA-Z]+$/))
+    ) {
+      return;
+    }
+    setInviteCode(newCode.toUpperCase());
+    if (newCode.length === 8) {
+      fetchInvite(socket, newCode);
+    }
+  };
+
+  const onClickSign = () => {
+    // do something
+  };
 
   return (
     <main className="flex pt-8" style={{ height: 'calc(100vh - 3rem)' }}>
@@ -56,6 +80,41 @@ const Play: React.FC = () => {
             numSuperpowers={bingo.superpowers.length}
             className="flex-1 overflow-scroll"
           />
+        ) : tab === PlayTab.SIGN ? (
+          <div className="flex-1">
+            <h1 className="font-bold text-2xl mb-2">Invite Code</h1>
+            <BingoInput
+              placeholder="Enter the invite code here"
+              value={inviteCode}
+              onChange={onChangeInviteCode}
+              className="p-4 text-xl mb-8"
+            />
+            <h1 className="font-bold text-2xl mb-2">Details</h1>
+            {inviteToSign == null ? (
+              <p className="font-regular">
+                Enter an invite code to view details.
+              </p>
+            ) : (
+              <>
+                <p className="font-regular text-md">
+                  You are signing superpower:
+                </p>
+                <p className="font-medium text-2xl">
+                  {inviteToSign.superpowerDescription}
+                </p>
+                <p className="font-regular text-md">for superhero:</p>
+                <p className="font-medium text-2xl mb-4">
+                  {inviteToSign.ownerName}
+                </p>
+              </>
+            )}
+            <BingoButton
+              text="Sign Superpower!"
+              isDisabled={inviteToSign == null}
+              onClick={onClickSign}
+              className="text-lg p-2 bg-red border-black border-4 mt-2"
+            />
+          </div>
         ) : null}
       </div>
     </main>

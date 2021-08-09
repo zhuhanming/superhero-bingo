@@ -109,22 +109,38 @@ const SuperpowerGrid: React.FC<Props> = ({
               );
             }
             const invite = invites.find((i) => i.superpowerId === s.id!)!;
+            const signee = superheroes.find((s) => s.id === invite.signeeId);
+
+            if (signee == null) {
+              return (
+                <div
+                  className={`bg-red border-black border-b-8 border-r-8 superpower-grid-cell flex justify-center items-center p-2 text-center break-words ${getFontSize()}`}
+                  key={s.uniqueId}
+                >
+                  <div
+                    className="has-tooltip cursor-pointer font-medium flex justify-center"
+                    onClick={() => onClickInviteCode(s.id!, invite.inviteCode)}
+                    onKeyDown={() =>
+                      onClickInviteCode(s.id!, invite.inviteCode)
+                    }
+                  >
+                    <span className="tooltip rounded shadow-lg py-1 px-2 bg-black text-white -mt-6 text-sm">
+                      {clicked[s.id!] === true ? 'Copied!' : invite.inviteCode}
+                    </span>
+                    {s.description}
+                  </div>
+                </div>
+              );
+            }
             return (
               <div
-                className={`${
-                  invite.signeeId != null ? 'bg-green' : 'bg-red'
-                } border-black border-b-8 border-r-8 superpower-grid-cell flex justify-center items-center p-2 text-center break-words ${getFontSize()}`}
+                className={`bg-green border-black border-b-8 border-r-8 superpower-grid-cell flex justify-center items-center p-2 text-center break-words ${getFontSize()}`}
                 key={s.uniqueId}
               >
-                <div
-                  className="has-tooltip cursor-pointer font-medium flex justify-center"
-                  onClick={() => onClickInviteCode(s.id!, invite.inviteCode)}
-                  onKeyDown={() => onClickInviteCode(s.id!, invite.inviteCode)}
-                >
-                  <span className="tooltip rounded shadow-lg py-1 px-2 bg-black text-white -mt-6 text-sm">
-                    {clicked[s.id!] === true ? 'Copied!' : invite.inviteCode}
-                  </span>
+                <div className="font-medium flex justify-center">
                   {s.description}
+                  <br />
+                  Signed by: {signee.name}
                 </div>
               </div>
             );

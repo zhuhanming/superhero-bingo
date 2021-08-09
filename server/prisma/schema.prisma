@@ -78,8 +78,9 @@ model HeroPowerPairing {
   signee       Superhero  @relation("signee", fields: [signeeId], references: [id], onDelete: Cascade)
   signeeId     Int
 
-  // Can only sign once for each person
+  // Can only sign once for each person for each superpower
   @@unique([ownerId, signeeId])
+  @@unique([ownerId, superpowerId])
 }
 
 model HeroPowerPairingInvites {
