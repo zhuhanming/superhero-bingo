@@ -27,7 +27,7 @@ jobs:
         run: yarn install
       - name: Build application
         run: yarn server build
-      - name: Copy /build folder to server
+      - name: Copy /server/build folder to server
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -35,7 +35,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           rm: true
           source: "server/build/"
-          target: "${{ secrets.REMOTE_DIR }}/server/build"
+          target: "${{ secrets.REMOTE_DIR }}/server"
       - name: Pull latest repository
         uses: appleboy/ssh-action@master
         with:
@@ -45,21 +45,16 @@ jobs:
           port: 22
           script: |
             cd ${{ secrets.REMOTE_DIR }}
-            git checkout master
+            git checkout main
             git pull
-            git reset --hard origin/master
+            git reset --hard origin/main
             yarn install
-            cd server/build/build
-            mv * ..
-            cd ..
-            rm -rf build
-            cd ../..
             pm2 stop ecosystem.config.js --only superhero-bingo
             yarn migrate
+            cp ecosystem.config.js ./server/build/
             cd server
             cp .env ./build/
-            cp ../ecosystem.config.js ./build/
             cp package.json ./build/
             cd build
+            yarn install
             pm2 restart ecosystem.config.js --only superhero-bingo --log-date-format="YYYY-MM-DD HH:mm Z"
-            pm2 logs --nostream
