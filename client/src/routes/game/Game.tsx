@@ -63,6 +63,7 @@ const Game: React.FC = () => {
           url={backgroundMusic}
           playStatus={isPlaying ? 'PLAYING' : 'PAUSED'}
           loop
+          volume={10}
         />
         <SoundButton
           isPlaying={isPlaying}
@@ -81,6 +82,7 @@ const Game: React.FC = () => {
           url={backgroundMusic}
           playStatus={isPlaying ? 'PLAYING' : 'PAUSED'}
           loop
+          volume={10}
         />
         <SoundButton
           isPlaying={isPlaying}
@@ -98,6 +100,7 @@ const Game: React.FC = () => {
         url={backgroundMusic}
         playStatus={isPlaying ? 'PLAYING' : 'PAUSED'}
         loop
+        volume={10}
       />
       <SoundButton
         isPlaying={isPlaying}
