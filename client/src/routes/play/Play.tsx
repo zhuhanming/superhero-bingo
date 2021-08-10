@@ -149,7 +149,7 @@ const Play: React.FC = () => {
               superheroes={game.heroes}
               leaderboard={leaderboard}
               numSuperpowers={bingo.superpowers.length}
-              className="flex-1 overflow-scroll"
+              className="flex-1 overflow-scroll hide-scrollbar"
             />
             <BingoButton
               text="Leave Game"

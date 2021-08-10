@@ -38,7 +38,9 @@ const SocketProvider: React.FunctionComponent = (props) => {
       console.log(eventName, args);
     };
 
-    socket.onAny(listener);
+    if (process.env.NODE_ENV === 'development') {
+      socket.onAny(listener);
+    }
 
     return () => {
       socket.disconnect();

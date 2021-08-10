@@ -126,7 +126,7 @@ const Game: React.FC = () => {
         <h1 className="font-bold text-3xl mt-8 mb-2">
           Superheroes ({game.heroes.length})
         </h1>
-        <div className="flex flex-1 flex-wrap w-full justify-center overflow-scroll">
+        <div className="flex flex-1 flex-wrap w-full justify-center overflow-scroll hide-scrollbar">
           {game.heroes.length === 0 && 'Waiting for heroes to join!'}
           {game.heroes
             .slice()

@@ -144,7 +144,7 @@ const Edit: React.FC = () => {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="flex w-full flex-col flex-1 overflow-scroll"
+                className="flex w-full flex-col flex-1 overflow-scroll hide-scrollbar"
               >
                 {superpowers.map((superpower, index) => (
                   <SuperpowerListItem
