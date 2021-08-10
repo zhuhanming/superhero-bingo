@@ -38,16 +38,13 @@ const SuperpowerGrid: React.FC<Props> = ({
   });
 
   const getFontSize = (): string => {
-    if (gridSize < 3) {
+    if (gridSize < 4) {
       return 'text-lg';
     }
-    if (gridSize === 3) {
+    if (gridSize === 4) {
       return 'text-md';
     }
-    if (gridSize === 4) {
-      return 'text-sm';
-    }
-    return 'text-xs';
+    return 'text-sm';
   };
 
   const onClickInviteCode = (id: number, inviteCode: string): void => {
