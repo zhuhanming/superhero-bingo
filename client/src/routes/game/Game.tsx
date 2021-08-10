@@ -10,7 +10,9 @@ import { useSocket } from 'contexts/SocketContext';
 import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
 import { fetchGameOwnerCode, startGame } from 'services/gameService';
+import { fetchResult } from 'services/resultService';
 
+import CompletedGame from './CompletedGame';
 import OngoingGame from './OngoingGame';
 
 const Game: React.FC = () => {
@@ -34,6 +36,12 @@ const Game: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (game.id !== -1) {
+      fetchResult(socket, game.id);
+    }
+  }, []);
+
+  useEffect(() => {
     dispatch(
       updateLoadingState({ isStartingGame: false, isEndingGame: false })
     );
@@ -45,7 +53,7 @@ const Game: React.FC = () => {
   };
 
   if (game.hasEnded) {
-    return <>Results Page</>;
+    return <CompletedGame />;
   }
 
   if (game.hasStarted) {

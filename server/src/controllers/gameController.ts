@@ -403,7 +403,7 @@ export const endGame = async (
     throw new Error('You do not have permissions to end this game!');
   }
 
-  const updatedGame = await prisma.game.update({
+  await prisma.game.update({
     where: {
       id: gameId,
     },
@@ -415,21 +415,39 @@ export const endGame = async (
     },
   });
 
+  return await fetchResults(gameId);
+};
+
+export const fetchResults = async (
+  gameId: number
+): Promise<SuperheroResult[]> => {
+  const game = await prisma.game.findUnique({
+    where: {
+      id: gameId,
+    },
+    include: {
+      heroes: true,
+    },
+  });
+  if (game == null) {
+    throw new Error('Invalid game ID provided!');
+  }
+  if (!game.hasEnded) {
+    throw new Error('The game has yet ended!');
+  }
   return await Promise.all(
-    updatedGame.heroes.map(async (hero) => {
+    game.heroes.map(async (hero) => {
       const powersInOwnBingoSigned = await prisma.heroPowerPairing.findMany({
         where: {
           ownerId: hero.id,
         },
       });
-      let timeWhenLastPowerInOwnBingoWasSigned = undefined;
+      let timeTakenToGetLastPowerSigned = undefined;
       if (powersInOwnBingoSigned.length > 0) {
-        timeWhenLastPowerInOwnBingoWasSigned = new Date(
-          Math.max.apply(
-            null,
-            powersInOwnBingoSigned.map((p) => p.createdAt.getTime())
-          )
-        );
+        timeTakenToGetLastPowerSigned =
+          Math.max(
+            ...powersInOwnBingoSigned.map((p) => p.createdAt.getTime())
+          ) - game.createdAt.getTime();
       }
       const numPowersInOwnBingoSigned = powersInOwnBingoSigned.length;
 
@@ -447,7 +465,7 @@ export const endGame = async (
         ).size;
       return {
         superhero: hero,
-        timeWhenLastPowerInOwnBingoWasSigned,
+        timeTakenToGetLastPowerSigned,
         numPowersInOwnBingoSigned,
         numPowersInOthersBingoSigned,
         numDifferentPowersInOthersBingoSigned,

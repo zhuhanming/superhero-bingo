@@ -1,10 +1,10 @@
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
+import { MAX_NUM_CHARS_SUPERPOWER_DESCRIPTION } from 'shared';
 
 import BingoInput from 'components/bingoInput';
 import DragHandle from 'components/dragHandle';
 import TrashIcon from 'components/trashIcon';
-import { MAX_DESCRIPTION_LENGTH } from 'constants/text';
 import { DuxSuperpower } from 'reducers/bingoDux';
 
 type Props = DuxSuperpower & {
@@ -51,7 +51,7 @@ const SuperpowerListItem: React.FC<Props> = ({
               onChange={onChangeDescription}
             />
             <div className="flex justify-end text-xs">
-              {description.length} / {MAX_DESCRIPTION_LENGTH}
+              {description.length} / {MAX_NUM_CHARS_SUPERPOWER_DESCRIPTION}
             </div>
           </div>
           <TrashIcon

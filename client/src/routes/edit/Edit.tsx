@@ -3,7 +3,11 @@ import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import autosize from 'autosize';
-import { NUM_CHARS_OWNER_CODE, validateBingo } from 'shared';
+import {
+  MAX_NUM_CHARS_SUPERPOWER_DESCRIPTION,
+  NUM_CHARS_OWNER_CODE,
+  validateBingo,
+} from 'shared';
 import { v4 as uuidv4 } from 'uuid';
 
 import BingoButton from 'components/bingoButton';
@@ -11,7 +15,6 @@ import BingoInput from 'components/bingoInput';
 import SuperpowerGrid from 'components/superpowerGrid';
 import SuperpowerListItem from 'components/superpowerListItem';
 import { GAME } from 'constants/routes';
-import { MAX_DESCRIPTION_LENGTH } from 'constants/text';
 import { useSocket } from 'contexts/SocketContext';
 import {
   addBingoSuperpower,
@@ -94,7 +97,7 @@ const Edit: React.FC = () => {
     description: string,
     changeUniqueId = false
   ): void => {
-    if (description.length > MAX_DESCRIPTION_LENGTH) {
+    if (description.length > MAX_NUM_CHARS_SUPERPOWER_DESCRIPTION) {
       return;
     }
     const updateObject: {

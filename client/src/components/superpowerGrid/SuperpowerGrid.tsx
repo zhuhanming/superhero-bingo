@@ -1,9 +1,8 @@
 /* eslint-disable jsx-a11y/no-static-element-interactions */
 import React, { useEffect, useState } from 'react';
 import autosize from 'autosize';
-import { Invite } from 'shared';
+import { Invite, MAX_NUM_CHARS_SUPERPOWER_DESCRIPTION } from 'shared';
 
-import { MAX_DESCRIPTION_LENGTH } from 'constants/text';
 import { DuxSuperpower } from 'reducers/bingoDux';
 import { sortByOrder } from 'utils/sortUtils';
 
@@ -97,7 +96,8 @@ const SuperpowerGrid: React.FC<Props> = ({
                     onKeyPress={(event) => {
                       if (
                         event.key === 'Enter' ||
-                        s.description.length >= MAX_DESCRIPTION_LENGTH
+                        s.description.length >=
+                          MAX_NUM_CHARS_SUPERPOWER_DESCRIPTION
                       ) {
                         event.preventDefault();
                       }

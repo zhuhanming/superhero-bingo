@@ -44,4 +44,8 @@ export const RES_SIGN_INVITE = 'res_sign_invite';
 export const ERROR_SIGN_INVITE = 'error_sign_invite';
 export const NOTIF_SIGN_INVITE = 'notif_sign_invite';
 
+export const REQ_FETCH_RESULT = 'req_fetch_result';
+export const RES_FETCH_RESULT = 'res_fetch_result';
+export const ERROR_FETCH_RESULT = 'error_fetch_result';
+
 export const SOCKET_DISCONNECT = 'disconnect';

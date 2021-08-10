@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
-import { NUM_CHARS_JOIN_CODE } from 'shared';
+import { MAX_NUM_CHARS_SUPERHERO_NAME, NUM_CHARS_JOIN_CODE } from 'shared';
 
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
 import Navbar from 'components/navbar';
 import { PLAY } from 'constants/routes';
-import { MAX_NAME_LENGTH } from 'constants/text';
 import { useSocket } from 'contexts/SocketContext';
 import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
@@ -76,7 +75,7 @@ const Join: React.FC = () => {
   };
 
   const onUpdateName = (newName: string) => {
-    if (newName.length > MAX_NAME_LENGTH) {
+    if (newName.length > MAX_NUM_CHARS_SUPERHERO_NAME) {
       return;
     }
     setName(newName);
@@ -112,7 +111,7 @@ const Join: React.FC = () => {
           isDisabled={isJoining}
         />
         <div className="w-full md:max-w-2xl flex justify-end text-xs mb-8">
-          {name.length} / {MAX_NAME_LENGTH}
+          {name.length} / {MAX_NUM_CHARS_SUPERHERO_NAME}
         </div>
         <BingoButton
           text="Join Now!"

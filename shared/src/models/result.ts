@@ -6,7 +6,7 @@ export type Leaderboard = {
 
 export type SuperheroResult = {
   superhero: Superhero;
-  timeWhenLastPowerInOwnBingoWasSigned?: Date; // undefined if no power signed
+  timeTakenToGetLastPowerSigned?: number; // undefined if no power signed
   numPowersInOwnBingoSigned: number;
   numPowersInOthersBingoSigned: number;
   numDifferentPowersInOthersBingoSigned: number;
