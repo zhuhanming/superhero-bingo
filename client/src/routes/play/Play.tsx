@@ -187,8 +187,18 @@ const Play: React.FC = () => {
               text="Sign Superpower!"
               isDisabled={inviteToSign == null}
               onClick={onClickSign}
-              className="text-lg p-2 bg-blue border-black border-4 mt-2"
+              className="text-lg p-2 bg-blue border-black border-4 mt-2 mb-8"
             />
+
+            <h1 className="font-bold text-2xl mb-2">How to Get a Box Code?</h1>
+            <p className="hidden md:block">
+              Simply hover over the box you want to get the code for and click
+              on the text to copy the code!
+            </p>
+            <p className="md:hidden">
+              Simply switch over to the Board tab and refer to the code above
+              each superpower!
+            </p>
           </div>
         ) : (
           <div className="md:hidden">
