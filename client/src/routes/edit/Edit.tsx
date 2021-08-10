@@ -148,6 +148,7 @@ const Edit: React.FC = () => {
               >
                 {superpowers.map((superpower, index) => (
                   <SuperpowerListItem
+                    isEdit
                     key={`superpower-list-item-${superpower.order}`}
                     {...superpower}
                     index={index}

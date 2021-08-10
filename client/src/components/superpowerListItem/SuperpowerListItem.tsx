@@ -1,25 +1,31 @@
 import React from 'react';
 import { Draggable } from 'react-beautiful-dnd';
-import { MAX_NUM_CHARS_SUPERPOWER_DESCRIPTION } from 'shared';
+import { Invite, MAX_NUM_CHARS_SUPERPOWER_DESCRIPTION } from 'shared';
 
 import BingoInput from 'components/bingoInput';
 import DragHandle from 'components/dragHandle';
 import TrashIcon from 'components/trashIcon';
 import { DuxSuperpower } from 'reducers/bingoDux';
+import { emptyFunction } from 'utils/callbackHandler';
 
 type Props = DuxSuperpower & {
-  index: number;
-  onChangeDescription: (description: string) => void;
-  onDelete: () => void;
+  isEdit: boolean;
+  index?: number;
+  onChangeDescription?: (description: string) => void;
+  onDelete?: () => void;
   className?: string;
+  invites?: Invite[];
 };
 
 const SuperpowerListItem: React.FC<Props> = ({
+  id,
+  isEdit,
   description,
   uniqueId,
-  onChangeDescription,
-  onDelete,
-  index,
+  onChangeDescription = emptyFunction,
+  onDelete = emptyFunction,
+  index = 0,
+  invites = [],
 }) => {
   const onClickDelete = () => {
     // eslint-disable-next-line no-alert
@@ -30,6 +36,16 @@ const SuperpowerListItem: React.FC<Props> = ({
       onDelete();
     }
   };
+
+  if (!isEdit) {
+    const invite = invites.find((i) => i.superpowerId === id);
+    return (
+      <div className="flex flex-col bg-gray mb-2 p-4 rounded-lg border-black border-4">
+        <div className="font-regular text-sm">{invite?.inviteCode}</div>
+        <div className="font-medium text-xl">{description}</div>
+      </div>
+    );
+  }
 
   return (
     <Draggable draggableId={uniqueId} index={index}>

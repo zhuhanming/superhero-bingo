@@ -8,6 +8,7 @@ import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
 import Leaderboard from 'components/leaderboard';
 import SuperpowerGrid from 'components/superpowerGrid';
+import SuperpowerListItem from 'components/superpowerListItem';
 import { JOIN, ROOT } from 'constants/routes';
 import { useSocket } from 'contexts/SocketContext';
 import { clearBingo } from 'reducers/bingoDux';
@@ -20,6 +21,7 @@ import { callbackHandler } from 'utils/callbackHandler';
 enum PlayTab {
   LEADERBOARD,
   SIGN,
+  BOARD,
 }
 
 const Play: React.FC = () => {
@@ -112,7 +114,7 @@ const Play: React.FC = () => {
       <div className="flex flex-col" style={{ flex: 2 }}>
         <div className="flex">
           <h1
-            className={`font-bold text-2xl mb-4 cursor-pointer ${
+            className={`font-bold text-xl md:text-2xl mb-4 cursor-pointer ${
               tab === PlayTab.LEADERBOARD ? 'text-black' : 'text-gray-500'
             }`}
             onClick={() => setTab(PlayTab.LEADERBOARD)}
@@ -121,13 +123,22 @@ const Play: React.FC = () => {
             Leaderboard
           </h1>
           <h1
-            className={`font-bold text-2xl mb-4 ml-8 cursor-pointer ${
+            className={`font-bold text-xl md:text-2xl mb-4 ml-4 md:ml-8 cursor-pointer ${
               tab === PlayTab.SIGN ? 'text-black' : 'text-gray-500'
             }`}
             onClick={() => setTab(PlayTab.SIGN)}
             onKeyDown={() => setTab(PlayTab.SIGN)}
           >
             Sign
+          </h1>
+          <h1
+            className={`md:hidden font-bold text-xl md:text-2xl mb-4 ml-4 md:ml-8 cursor-pointer ${
+              tab === PlayTab.BOARD ? 'text-black' : 'text-gray-500'
+            }`}
+            onClick={() => setTab(PlayTab.BOARD)}
+            onKeyDown={() => setTab(PlayTab.BOARD)}
+          >
+            Board
           </h1>
         </div>
         {tab === PlayTab.LEADERBOARD ? (
@@ -179,7 +190,19 @@ const Play: React.FC = () => {
               className="text-lg p-2 bg-blue border-black border-4 mt-2"
             />
           </div>
-        ) : null}
+        ) : (
+          <div className="md:hidden">
+            {bingo.superpowers.map((p, index) => (
+              <SuperpowerListItem
+                isEdit={false}
+                {...p}
+                index={index}
+                key={`superpower-list-${p.uniqueId}`}
+                invites={invitations}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </main>
   );
