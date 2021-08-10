@@ -1,6 +1,7 @@
 import {
   ERROR_FETCH_INVITE,
   ERROR_SIGN_INVITE,
+  NOTIF_OWNER_SIGN_INVITE,
   NOTIF_SIGN_INVITE,
   RES_FETCH_INVITE,
   RES_SIGN_INVITE,
@@ -55,6 +56,11 @@ export const socketSignInvite = (
       io.in(`room-${signee.gameId}`).emit(NOTIF_SIGN_INVITE, {
         ownerId,
         numSigned,
+        inviteId,
+        signee,
+      });
+      io.in(`room-${signee.gameId}-owner`).emit(NOTIF_OWNER_SIGN_INVITE, {
+        ownerId,
         inviteId,
         signee,
       });

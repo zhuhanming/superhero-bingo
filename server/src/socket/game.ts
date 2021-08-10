@@ -9,6 +9,8 @@ import {
   NOTIF_END_GAME,
   NOTIF_JOIN_GAME,
   NOTIF_LEAVE_GAME,
+  NOTIF_OWNER_JOIN_GAME,
+  NOTIF_OWNER_LEAVE_GAME,
   NOTIF_START_GAME,
   RES_CREATE_GAME,
   RES_END_GAME,
@@ -50,6 +52,7 @@ export const socketCreateGame = (
     try {
       const game = await GameController.createGame(ownerCode);
       socket.join(`room-${game.id}`);
+      socket.join(`room-${game.id}-owner`);
       socket.emit(RES_CREATE_GAME, game);
     } catch (error) {
       socket.emit(ERROR_CREATE_GAME, error.message);
@@ -58,7 +61,7 @@ export const socketCreateGame = (
 };
 
 export const socketJoinGame = (
-  _io: Server,
+  io: Server,
   socket: Socket
 ): JoinGameFunction => {
   return async (data: { joinCode: string; name: string }): Promise<void> => {
@@ -73,6 +76,11 @@ export const socketJoinGame = (
       socket.emit(RES_JOIN_GAME, { game, bingo, user, token, invites });
       // Notify all current users that someone joined
       socket.to(`room-${game.id}`).emit(NOTIF_JOIN_GAME, user);
+      // Notify owner with a copy of the invites
+      io.in(`room-${game.id}-owner`).emit(NOTIF_OWNER_JOIN_GAME, {
+        user,
+        invites,
+      });
     } catch (error) {
       socket.emit(ERROR_JOIN_GAME, error.message);
     }
@@ -91,6 +99,7 @@ export const socketFetchGameOwnerCode = (
       const { game, bingo, leaderboard } =
         await GameController.fetchGameOwnerCode(ownerString);
       socket.join(`room-${game.id}`);
+      socket.join(`room-${game.id}-owner`);
       socket.emit(RES_FETCH_GAME_OWNER_CODE, { game, bingo, leaderboard });
     } catch (error) {
       socket.emit(ERROR_FETCH_GAME_OWNER_CODE, error.message);
@@ -125,7 +134,7 @@ export const socketFetchGameUserToken = (
 };
 
 export const socketLeaveGame = (
-  _io: Server,
+  io: Server,
   socket: Socket
 ): LeaveGameFunction => {
   return async (token: string): Promise<void> => {
@@ -140,6 +149,7 @@ export const socketLeaveGame = (
         .emit(NOTIF_LEAVE_GAME, { superheroId, leaderboard });
       socket.leave(`room-${gameId}`);
       socket.emit(RES_LEAVE_GAME);
+      io.in(`room-${gameId}-owner`).emit(NOTIF_OWNER_LEAVE_GAME, superheroId);
     } catch (error) {
       socket.emit(ERROR_LEAVE_GAME, error.message);
     }

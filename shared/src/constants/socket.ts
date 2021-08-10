@@ -48,4 +48,8 @@ export const REQ_FETCH_RESULT = 'req_fetch_result';
 export const RES_FETCH_RESULT = 'res_fetch_result';
 export const ERROR_FETCH_RESULT = 'error_fetch_result';
 
+export const NOTIF_OWNER_JOIN_GAME = 'notif_owner_join_game';
+export const NOTIF_OWNER_LEAVE_GAME = 'notif_owner_leave_game';
+export const NOTIF_OWNER_SIGN_INVITE = 'notif_owner_sign_invite';
+
 export const SOCKET_DISCONNECT = 'disconnect';
