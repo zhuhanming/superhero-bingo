@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 import { MAX_NUM_CHARS_SUPERHERO_NAME, NUM_CHARS_JOIN_CODE } from 'shared';
 
+import PandaHead from 'assets/svgr/PandaHead';
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
 import Navbar from 'components/navbar';
@@ -49,6 +50,7 @@ const Join: React.FC = () => {
         style={{ minHeight: 'calc(100vh - 6rem)' }}
         className="flex flex-col justify-center items-center text-center"
       >
+        <PandaHead className="h-20 mb-4" />
         <h1 className="font-bold text-3xl mb-12">
           Welcome, {self.name}. Waiting for the game to start...
         </h1>

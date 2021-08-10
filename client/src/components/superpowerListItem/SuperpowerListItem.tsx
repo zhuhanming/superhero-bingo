@@ -40,8 +40,16 @@ const SuperpowerListItem: React.FC<Props> = ({
   if (!isEdit) {
     const invite = invites.find((i) => i.superpowerId === id);
     return (
-      <div className="flex flex-col bg-gray mb-2 p-4 rounded-lg border-black border-4">
-        <div className="font-regular text-sm">{invite?.inviteCode}</div>
+      <div
+        className={`flex flex-col ${
+          invite?.signeeId == null ? 'bg-gray' : 'bg-green'
+        } mb-2 p-4 rounded-lg border-black border-4`}
+      >
+        <div className="font-regular text-sm">
+          {invite?.signeeId == null
+            ? invite?.inviteCode
+            : `Signed by: ${invite?.signeeName}`}
+        </div>
         <div className="font-medium text-xl">{description}</div>
       </div>
     );

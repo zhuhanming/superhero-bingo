@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
 
+import KoalaHead from 'assets/svgr/KoalaHead';
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
 import Leaderboard from 'components/leaderboard';
@@ -55,6 +56,7 @@ const Play: React.FC = () => {
         className="flex flex-col items-center justify-center"
         style={{ height: 'calc(100vh - 3rem)' }}
       >
+        <KoalaHead className="h-20 mb-4" />
         <h1 className="font-bold text-3xl mb-12">The game has ended!</h1>
         <h1 className="font-bold text-2xl mb-16 text-center text-red">
           Please see the main screen for the results!
@@ -62,7 +64,7 @@ const Play: React.FC = () => {
         <BingoButton
           text="Back to Home Page"
           onClick={onClickBackToHome}
-          className="text-lg p-2 bg-red border-black border-4 mt-4"
+          className="text-lg lg:max-w-2xl p-2 bg-red border-black border-4 mt-4"
         />
       </main>
     );
