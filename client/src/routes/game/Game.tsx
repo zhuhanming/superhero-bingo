@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useHistory } from 'react-router-dom';
+import Sound from 'react-sound';
 
+import backgroundMusic from 'assets/music/bgm.mp3';
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
+import SoundButton from 'components/soundButton';
 import { ROOT } from 'constants/routes';
 import { SITE_URL } from 'constants/urls';
 import { useSocket } from 'contexts/SocketContext';
@@ -18,6 +21,7 @@ import OngoingGame from './OngoingGame';
 const Game: React.FC = () => {
   const history = useHistory();
   const game = useSelector((state: RootState) => state.game.game);
+  const [isPlaying, setIsPlaying] = useState(true);
   const isStartingGame = useSelector(
     (state: RootState) => state.misc.loading.isStartingGame
   );
@@ -53,15 +57,53 @@ const Game: React.FC = () => {
   };
 
   if (game.hasEnded) {
-    return <CompletedGame />;
+    return (
+      <>
+        <Sound
+          url={backgroundMusic}
+          playStatus={isPlaying ? 'PLAYING' : 'PAUSED'}
+          loop
+        />
+        <SoundButton
+          isPlaying={isPlaying}
+          onClick={() => setIsPlaying((isPlaying) => !isPlaying)}
+          className="absolute bottom-10 left-10 text-xl"
+        />
+        <CompletedGame />
+      </>
+    );
   }
 
   if (game.hasStarted) {
-    return <OngoingGame />;
+    return (
+      <>
+        <Sound
+          url={backgroundMusic}
+          playStatus={isPlaying ? 'PLAYING' : 'PAUSED'}
+          loop
+        />
+        <SoundButton
+          isPlaying={isPlaying}
+          onClick={() => setIsPlaying((isPlaying) => !isPlaying)}
+          className="absolute bottom-10 left-10 text-xl"
+        />
+        <OngoingGame />
+      </>
+    );
   }
 
   return (
     <>
+      <Sound
+        url={backgroundMusic}
+        playStatus={isPlaying ? 'PLAYING' : 'PAUSED'}
+        loop
+      />
+      <SoundButton
+        isPlaying={isPlaying}
+        onClick={() => setIsPlaying((isPlaying) => !isPlaying)}
+        className="absolute bottom-10 left-10 text-xl"
+      />
       <main
         className="flex flex-col items-center"
         style={{ height: 'calc(100vh - 6rem)' }}
