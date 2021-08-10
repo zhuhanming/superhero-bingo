@@ -113,7 +113,17 @@ export const signInvite = async (
     },
   });
   if (existingPairing != null) {
-    throw new Error('You have previously signed for this user!');
+    throw new Error('You have already signed a power for this user!');
+  }
+
+  const numIncompleteGame = await prisma.game.count({
+    where: {
+      id: payload.gameId,
+      hasEnded: false,
+    },
+  });
+  if (numIncompleteGame === 0) {
+    throw new Error('The game has already ended!');
   }
 
   const pairing = await prisma.heroPowerPairing.create({

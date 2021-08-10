@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
+import { ROOT } from 'constants/routes';
 import { SITE_URL } from 'constants/urls';
 import { useSocket } from 'contexts/SocketContext';
 import { updateLoadingState } from 'reducers/miscDux';
@@ -12,6 +14,7 @@ import { fetchGameOwnerCode, startGame } from 'services/gameService';
 import OngoingGame from './OngoingGame';
 
 const Game: React.FC = () => {
+  const history = useHistory();
   const game = useSelector((state: RootState) => state.game.game);
   const isStartingGame = useSelector(
     (state: RootState) => state.misc.loading.isStartingGame
@@ -25,11 +28,15 @@ const Game: React.FC = () => {
   useEffect(() => {
     if (ownerCode !== '') {
       fetchGameOwnerCode(socket, ownerCode);
+    } else {
+      history.push(ROOT);
     }
   }, []);
 
   useEffect(() => {
-    dispatch(updateLoadingState({ isStartingGame: false }));
+    dispatch(
+      updateLoadingState({ isStartingGame: false, isEndingGame: false })
+    );
   }, []);
 
   const onStartGame = () => {

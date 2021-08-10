@@ -3,9 +3,11 @@ import {
   CreatedBingo,
   Game,
   Invite,
+  Leaderboard,
   NUM_CHARS_JOIN_CODE,
   NUM_CHARS_SUPERPOWER_BOX_CODE,
   Superhero,
+  SuperheroResult,
 } from 'shared';
 
 import prisma from 'lib/prisma';
@@ -140,7 +142,7 @@ export const fetchGameOwnerCode = async (
 ): Promise<{
   game: Game;
   bingo: CreatedBingo;
-  leaderboard: { [id: number]: number };
+  leaderboard: Leaderboard;
 }> => {
   const bingo = await prisma.bingo.findUnique({
     where: {
@@ -153,33 +155,36 @@ export const fetchGameOwnerCode = async (
   if (bingo == null) {
     throw new Error('Invalid owner code!');
   }
-  const game = await prisma.game.findFirst({
+  const games = await prisma.game.findMany({
     where: {
       bingoId: bingo.id,
-      hasEnded: false,
     },
     include: {
       heroes: true,
     },
+    orderBy: {
+      createdAt: 'desc',
+    },
+    take: 1,
   });
-  if (game === null) {
-    throw new Error('No ongoing game for bingo with provided owner code!');
+  if (games.length === 0) {
+    throw new Error('No game exists for bingo with provided owner code!');
   }
   const superheroes = await prisma.superhero.findMany({
     where: {
-      gameId: game.id,
+      gameId: games[0].id,
     },
     include: {
       pairings: true,
     },
   });
 
-  const leaderboard = superheroes.reduce((acc: { [id: number]: number }, s) => {
+  const leaderboard = superheroes.reduce((acc: Leaderboard, s) => {
     acc[s.id] = s.pairings.length;
     return acc;
   }, {});
 
-  return { game, bingo, leaderboard };
+  return { game: games[0], bingo, leaderboard };
 };
 
 export const fetchGameUserToken = async (
@@ -190,7 +195,7 @@ export const fetchGameUserToken = async (
   user: Superhero;
   token: string;
   invites: Invite[];
-  leaderboard: { [id: number]: number };
+  leaderboard: Leaderboard;
 }> => {
   let payload;
   try {
@@ -209,17 +214,16 @@ export const fetchGameUserToken = async (
   if (user == null) {
     throw new Error('No such user exists!');
   }
-  const game = await prisma.game.findFirst({
+  const game = await prisma.game.findUnique({
     where: {
       id: user.gameId,
-      hasEnded: false,
     },
     include: {
       heroes: true,
     },
   });
   if (game == null) {
-    throw new Error('Game has already completed!');
+    throw new Error('Invalid token provided!');
   }
   const bingo = await prisma.bingo.findUnique({
     where: {
@@ -241,7 +245,7 @@ export const fetchGameUserToken = async (
     },
   });
 
-  const leaderboard = superheroes.reduce((acc: { [id: number]: number }, s) => {
+  const leaderboard = superheroes.reduce((acc: Leaderboard, s) => {
     acc[s.id] = s.pairings.length;
     return acc;
   }, {});
@@ -282,7 +286,7 @@ export const leaveGame = async (
 ): Promise<{
   gameId: number;
   superheroId: number;
-  leaderboard: { [id: number]: number };
+  leaderboard: Leaderboard;
 }> => {
   let payload;
   try {
@@ -322,7 +326,7 @@ export const leaveGame = async (
     },
   });
 
-  const leaderboard = superheroes.reduce((acc: { [id: number]: number }, s) => {
+  const leaderboard = superheroes.reduce((acc: Leaderboard, s) => {
     acc[s.id] = s.pairings.length;
     return acc;
   }, {});
@@ -375,4 +379,79 @@ export const startGame = async (
     throw new Error('The bingo seems to have been deleted!');
   }
   return { game: updatedGame, bingo };
+};
+
+export const endGame = async (
+  gameId: number,
+  ownerCode: string
+): Promise<SuperheroResult[]> => {
+  const game = await prisma.game.findUnique({
+    where: {
+      id: gameId,
+    },
+    include: {
+      bingo: true,
+    },
+  });
+  if (game == null) {
+    throw new Error('Invalid game ID provided!');
+  }
+  if (game.hasEnded) {
+    throw new Error('This game has already ended!');
+  }
+  if (game.bingo.ownerCode !== ownerCode) {
+    throw new Error('You do not have permissions to end this game!');
+  }
+
+  const updatedGame = await prisma.game.update({
+    where: {
+      id: gameId,
+    },
+    data: {
+      hasEnded: true,
+    },
+    include: {
+      heroes: true,
+    },
+  });
+
+  return await Promise.all(
+    updatedGame.heroes.map(async (hero) => {
+      const powersInOwnBingoSigned = await prisma.heroPowerPairing.findMany({
+        where: {
+          ownerId: hero.id,
+        },
+      });
+      let timeWhenLastPowerInOwnBingoWasSigned = undefined;
+      if (powersInOwnBingoSigned.length > 0) {
+        timeWhenLastPowerInOwnBingoWasSigned = new Date(
+          Math.max.apply(
+            null,
+            powersInOwnBingoSigned.map((p) => p.createdAt.getTime())
+          )
+        );
+      }
+      const numPowersInOwnBingoSigned = powersInOwnBingoSigned.length;
+
+      const powersInOthersBingoSigned = await prisma.heroPowerPairing.findMany({
+        where: {
+          signeeId: hero.id,
+        },
+      });
+      const numPowersInOthersBingoSigned = powersInOthersBingoSigned.length;
+      const numDifferentPowersInOthersBingoSigned = powersInOthersBingoSigned
+        .map((p) => p.superpowerId)
+        .reduce(
+          (acc: Set<number>, id: number) => acc.add(id),
+          new Set<number>()
+        ).size;
+      return {
+        superhero: hero,
+        timeWhenLastPowerInOwnBingoWasSigned,
+        numPowersInOwnBingoSigned,
+        numPowersInOthersBingoSigned,
+        numDifferentPowersInOthersBingoSigned,
+      };
+    })
+  );
 };

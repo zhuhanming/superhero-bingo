@@ -8,9 +8,10 @@ import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
 import Leaderboard from 'components/leaderboard';
 import SuperpowerGrid from 'components/superpowerGrid';
-import { JOIN } from 'constants/routes';
+import { JOIN, ROOT } from 'constants/routes';
 import { useSocket } from 'contexts/SocketContext';
-import { clearInviteToSign } from 'reducers/gameDux';
+import { clearBingo } from 'reducers/bingoDux';
+import { clearGameDux, clearInviteToSign } from 'reducers/gameDux';
 import { RootState } from 'reducers/rootReducer';
 import { fetchGameUserToken, leaveGame } from 'services/gameService';
 import { fetchInvite, signInvite } from 'services/inviteService';
@@ -33,10 +34,37 @@ const Play: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
-    if (self.token != null) {
+    if (self.token !== '') {
       fetchGameUserToken(socket, self.token);
+    } else {
+      history.push(ROOT);
     }
   }, []);
+
+  const onClickBackToHome = () => {
+    dispatch(clearBingo());
+    dispatch(clearGameDux());
+    history.push(ROOT);
+  };
+
+  if (game.hasEnded) {
+    return (
+      <main
+        className="flex flex-col items-center justify-center"
+        style={{ height: 'calc(100vh - 3rem)' }}
+      >
+        <h1 className="font-bold text-3xl mb-12">The game has ended!</h1>
+        <h1 className="font-bold text-2xl mb-16 text-center text-red">
+          Please see the main screen for the results!
+        </h1>
+        <BingoButton
+          text="Back to Home Page"
+          onClick={onClickBackToHome}
+          className="text-lg p-2 bg-red border-black border-4 mt-4"
+        />
+      </main>
+    );
+  }
 
   const onChangeInviteCode = (newCode: string) => {
     if (
@@ -56,6 +84,7 @@ const Play: React.FC = () => {
     if (inviteToSign == null) {
       return;
     }
+    callbackHandler.signInviteCallback = () => setInviteCode('');
     signInvite(socket, inviteToSign.inviteCode, self.token);
   };
 

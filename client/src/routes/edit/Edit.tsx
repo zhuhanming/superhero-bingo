@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import BingoButton from 'components/bingoButton';
 import BingoInput from 'components/bingoInput';
-import Navbar from 'components/navbar';
 import SuperpowerGrid from 'components/superpowerGrid';
 import SuperpowerListItem from 'components/superpowerListItem';
 import { GAME } from 'constants/routes';
@@ -115,83 +114,80 @@ const Edit: React.FC = () => {
   };
 
   return (
-    <>
-      <Navbar />
-      <main className="flex mt-8" style={{ height: 'calc(100vh - 8rem)' }}>
-        <div className="flex flex-col" style={{ flex: 2 }}>
-          <h1 className="font-bold text-2xl mb-4">
-            Make Your Superpower Collection!
-          </h1>
-          <h2 className="font-bold text-lg">Name of Collection</h2>
-          <BingoInput
-            className="p-2 text-lg mb-4"
-            placeholder="Name of Your Collection"
-            value={bingo.name}
-            onChange={(value) => dispatch(updateBingoName(value))}
-          />
-          <h2 className="font-bold text-lg">Owner Code</h2>
-          <BingoInput
-            className="p-2 text-lg mb-4"
-            placeholder="Save this collection to get a code"
-            value={bingo.ownerCode}
-            onChange={() => undefined}
-            isDisabled
-          />
-          <h2 className="font-bold text-lg mb-2">Superpowers</h2>
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="superpowers" type="superpowers">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="flex w-full flex-col flex-1 overflow-scroll"
-                >
-                  {superpowers.map((superpower, index) => (
-                    <SuperpowerListItem
-                      key={`superpower-list-item-${superpower.order}`}
-                      {...superpower}
-                      index={index}
-                      onChangeDescription={(description) =>
-                        onSuperpowerChange(index, description, true)
-                      }
-                      onDelete={() => onSuperpowerDelete(index)}
-                    />
-                  ))}
-                </div>
-              )}
-            </Droppable>
-          </DragDropContext>
-          <BingoButton
-            text="Add New Superpower"
-            onClick={onClickAdd}
-            isDisabled={superpowers.length >= 25 || isSaving || isCreatingRoom}
-            className="text-lg p-2 bg-white border-black border-4 mt-2"
-            hasHover={false}
-          />
-          <BingoButton
-            text="Save Changes"
-            className="text-lg p-2 bg-blue border-black border-4 mt-2"
-            onClick={onClickSave}
-            isDisabled={isCreatingRoom}
-            isLoading={isSaving}
-          />
-          <BingoButton
-            text="Create Room"
-            className="text-lg p-2 bg-green border-black border-4 mt-2"
-            onClick={onClickStart}
-            isDisabled={bingo.id < 0 || isSaving}
-            isLoading={isCreatingRoom}
-          />
-        </div>
-        <div className="hidden md:block" style={{ flex: 3 }}>
-          <SuperpowerGrid
-            superpowers={superpowers}
-            onChangeGridCell={onSuperpowerChange}
-            className="pl-20"
-          />
-        </div>
-      </main>
-    </>
+    <main className="flex pt-8" style={{ height: 'calc(100vh - 3rem)' }}>
+      <div className="flex flex-col" style={{ flex: 2 }}>
+        <h1 className="font-bold text-2xl mb-4">
+          Make Your Superpower Collection!
+        </h1>
+        <h2 className="font-bold text-lg">Name of Collection</h2>
+        <BingoInput
+          className="p-2 text-lg mb-4"
+          placeholder="Name of Your Collection"
+          value={bingo.name}
+          onChange={(value) => dispatch(updateBingoName(value))}
+        />
+        <h2 className="font-bold text-lg">Owner Code</h2>
+        <BingoInput
+          className="p-2 text-lg mb-4"
+          placeholder="Save this collection to get a code"
+          value={bingo.ownerCode}
+          onChange={() => undefined}
+          isDisabled
+        />
+        <h2 className="font-bold text-lg mb-2">Superpowers</h2>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="superpowers" type="superpowers">
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="flex w-full flex-col flex-1 overflow-scroll"
+              >
+                {superpowers.map((superpower, index) => (
+                  <SuperpowerListItem
+                    key={`superpower-list-item-${superpower.order}`}
+                    {...superpower}
+                    index={index}
+                    onChangeDescription={(description) =>
+                      onSuperpowerChange(index, description, true)
+                    }
+                    onDelete={() => onSuperpowerDelete(index)}
+                  />
+                ))}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+        <BingoButton
+          text="Add New Superpower"
+          onClick={onClickAdd}
+          isDisabled={superpowers.length >= 25 || isSaving || isCreatingRoom}
+          className="text-lg p-2 bg-white border-black border-4 mt-2"
+          hasHover={false}
+        />
+        <BingoButton
+          text="Save Changes"
+          className="text-lg p-2 bg-blue border-black border-4 mt-2"
+          onClick={onClickSave}
+          isDisabled={isCreatingRoom}
+          isLoading={isSaving}
+        />
+        <BingoButton
+          text="Create Room"
+          className="text-lg p-2 bg-green border-black border-4 mt-2"
+          onClick={onClickStart}
+          isDisabled={bingo.id < 0 || isSaving}
+          isLoading={isCreatingRoom}
+        />
+      </div>
+      <div className="hidden md:block" style={{ flex: 3 }}>
+        <SuperpowerGrid
+          superpowers={superpowers}
+          onChangeGridCell={onSuperpowerChange}
+          className="pl-20"
+        />
+      </div>
+    </main>
   );
 };
 

@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Game, Invite, Superhero } from 'shared';
+import { Game, Invite, Leaderboard, Superhero, SuperheroResult } from 'shared';
 
 export type DuxSuperhero = Superhero & {
   token: string;
@@ -9,9 +9,10 @@ export type DuxSuperhero = Superhero & {
 export interface GameDux {
   game: Game;
   self: DuxSuperhero;
-  leaderboard: { [heroId: number]: number };
+  leaderboard: Leaderboard;
   invitations: Invite[];
   inviteToSign?: Invite;
+  results: SuperheroResult[];
 }
 
 const initialState: GameDux = {
@@ -32,6 +33,7 @@ const initialState: GameDux = {
   leaderboard: {},
   invitations: [],
   inviteToSign: undefined,
+  results: [],
 };
 
 // Contains user information, theme, view selected and fun fact of the day
@@ -56,10 +58,7 @@ const game = createSlice({
       delete leaderboard[action.payload];
       state.leaderboard = leaderboard;
     },
-    setLeaderboard: (
-      state,
-      action: PayloadAction<{ [id: number]: number }>
-    ): void => {
+    setLeaderboard: (state, action: PayloadAction<Leaderboard>): void => {
       state.leaderboard = action.payload;
     },
     updateSuperheroScore: (
@@ -101,6 +100,15 @@ const game = createSlice({
     setInviteToSign: (state, action: PayloadAction<Invite>): void => {
       state.inviteToSign = action.payload;
     },
+    setSuperheroResults: (
+      state,
+      action: PayloadAction<SuperheroResult[]>
+    ): void => {
+      state.results = action.payload;
+    },
+    endGameDux: (state): void => {
+      state.game.hasEnded = true;
+    },
     clearGameDux: (state): void => {
       state.game = {
         id: -1,
@@ -119,6 +127,7 @@ const game = createSlice({
       state.leaderboard = {};
       state.invitations = [];
       state.inviteToSign = undefined;
+      state.results = [];
     },
     clearLeaderboard: (state): void => {
       state.leaderboard = {};
@@ -139,6 +148,8 @@ export const {
   setInvitations,
   trySignInvitation,
   setInviteToSign,
+  setSuperheroResults,
+  endGameDux,
   clearGameDux,
   clearLeaderboard,
   clearInviteToSign,

@@ -2,6 +2,7 @@ import {
   CONNECT,
   REQ_CREATE_BINGO,
   REQ_CREATE_GAME,
+  REQ_END_GAME,
   REQ_FETCH_BINGO,
   REQ_FETCH_GAME_OWNER_CODE,
   REQ_FETCH_GAME_USER_TOKEN,
@@ -41,6 +42,7 @@ const setUpIo = (io: Server): void => {
     );
     socket.on(REQ_LEAVE_GAME, GameHandler.socketLeaveGame(io, socket));
     socket.on(REQ_START_GAME, GameHandler.socketStartGame(io, socket));
+    socket.on(REQ_END_GAME, GameHandler.socketEndGame(io, socket));
 
     // Invite handlersx
     socket.on(REQ_FETCH_INVITE, InviteHandler.socketFetchInvite(io, socket));

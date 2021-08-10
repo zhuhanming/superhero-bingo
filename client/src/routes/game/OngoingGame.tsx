@@ -1,9 +1,12 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import BingoButton from 'components/bingoButton';
 import Leaderboard from 'components/leaderboard';
+import { useSocket } from 'contexts/SocketContext';
+import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
+import { endGame } from 'services/gameService';
 
 const OngoingGame: React.FC = () => {
   const bingo = useSelector((state: RootState) => state.bingo.bingo);
@@ -11,12 +14,16 @@ const OngoingGame: React.FC = () => {
   const isEndingGame = useSelector(
     (state: RootState) => state.misc.loading.isEndingGame
   );
+  const dispatch = useDispatch();
+  const { socket } = useSocket();
+
   const onClickEndGame = () => {
-    // Do something
+    dispatch(updateLoadingState({ isEndingGame: true }));
+    endGame(socket, game.id, bingo.ownerCode);
   };
 
   return (
-    <main className="flex mt-8" style={{ height: 'calc(100vh - 8rem)' }}>
+    <main className="flex pt-8" style={{ height: 'calc(100vh - 3rem)' }}>
       <div className="hidden md:block mr-8" style={{ flex: 3 }}>
         <h1 className="font-bold text-2xl mb-4">How to Play</h1>
         <p className="text-xl font-regular mb-4">

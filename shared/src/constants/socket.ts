@@ -34,6 +34,7 @@ export const NOTIF_START_GAME = 'notif_start_game';
 export const REQ_END_GAME = 'req_end_game';
 export const RES_END_GAME = 'res_end_game';
 export const ERROR_END_GAME = 'error_end_game';
+export const NOTIF_END_GAME = 'notif_end_game';
 
 export const REQ_FETCH_INVITE = 'req_fetch_invite';
 export const RES_FETCH_INVITE = 'res_fetch_invite';

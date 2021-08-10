@@ -2,6 +2,7 @@ import { toast } from 'react-toastify';
 import {
   CreatedBingo,
   ERROR_CREATE_GAME,
+  ERROR_END_GAME,
   ERROR_FETCH_GAME_OWNER_CODE,
   ERROR_FETCH_GAME_USER_TOKEN,
   ERROR_JOIN_GAME,
@@ -9,22 +10,27 @@ import {
   ERROR_START_GAME,
   Game,
   Invite,
+  Leaderboard,
+  NOTIF_END_GAME,
   NOTIF_JOIN_GAME,
   NOTIF_LEAVE_GAME,
   NOTIF_START_GAME,
   REQ_CREATE_GAME,
+  REQ_END_GAME,
   REQ_FETCH_GAME_OWNER_CODE,
   REQ_FETCH_GAME_USER_TOKEN,
   REQ_JOIN_GAME,
   REQ_LEAVE_GAME,
   REQ_START_GAME,
   RES_CREATE_GAME,
+  RES_END_GAME,
   RES_FETCH_GAME_OWNER_CODE,
   RES_FETCH_GAME_USER_TOKEN,
   RES_JOIN_GAME,
   RES_LEAVE_GAME,
   RES_START_GAME,
   Superhero,
+  SuperheroResult,
 } from 'shared';
 import { Socket } from 'socket.io-client';
 
@@ -34,11 +40,13 @@ import {
   addSuperhero,
   clearGameDux,
   clearLeaderboard,
+  endGameDux,
   removeSuperhero,
   setGame,
   setInvitations,
   setLeaderboard,
   setSelf,
+  setSuperheroResults,
 } from 'reducers/gameDux';
 import { updateLoadingState } from 'reducers/miscDux';
 import { callbackHandler, emptyFunction } from 'utils/callbackHandler';
@@ -114,7 +122,7 @@ const fetchedGameOwnerCode = (socket: Socket): void => {
     (payload: {
       game: Game;
       bingo: CreatedBingo;
-      leaderboard: { [id: number]: number };
+      leaderboard: Leaderboard;
     }) => {
       store.dispatch(setGame(payload.game));
       store.dispatch(setBingo({ bingo: payload.bingo, isOwner: true }));
@@ -142,13 +150,13 @@ const fetchedGameUserToken = (socket: Socket): void => {
     (payload: {
       game: Game;
       bingo: CreatedBingo;
-      leaderboard: { [id: number]: number };
+      leaderboard: Leaderboard;
       user: Superhero;
       invites: Invite[];
       token: string;
     }) => {
       store.dispatch(setGame(payload.game));
-      store.dispatch(setBingo({ bingo: payload.bingo, isOwner: true }));
+      store.dispatch(setBingo({ bingo: payload.bingo, isOwner: false }));
       store.dispatch(setLeaderboard(payload.leaderboard));
       store.dispatch(setSelf({ ...payload.user, token: payload.token }));
       store.dispatch(setInvitations(payload.invites));
@@ -190,10 +198,7 @@ const onErrorLeaveGame = (socket: Socket): void => {
 const onNotifLeaveGame = (socket: Socket): void => {
   socket.on(
     NOTIF_LEAVE_GAME,
-    (payload: {
-      superheroId: number;
-      leaderboard: { [id: number]: number };
-    }) => {
+    (payload: { superheroId: number; leaderboard: Leaderboard }) => {
       store.dispatch(removeSuperhero(payload.superheroId));
       store.dispatch(setLeaderboard(payload.leaderboard));
     }
@@ -235,6 +240,38 @@ const onNotifStartGame = (socket: Socket): void => {
   );
 };
 
+export const endGame = (
+  socket: Socket,
+  gameId: number,
+  ownerCode: string
+): void => {
+  socket.emit(REQ_END_GAME, { gameId, ownerCode });
+};
+
+const endedGame = (socket: Socket): void => {
+  socket.on(RES_END_GAME, (payload: SuperheroResult[]) => {
+    store.dispatch(updateLoadingState({ isEndingGame: false }));
+    store.dispatch(setSuperheroResults(payload));
+    store.dispatch(endGameDux());
+    callbackHandler.endGameCallback();
+    callbackHandler.endGameCallback = emptyFunction;
+  });
+};
+
+const onErrorEndGame = (socket: Socket): void => {
+  socket.on(ERROR_END_GAME, (payload: string) => {
+    store.dispatch(updateLoadingState({ isEndingGame: false }));
+    toast(payload, { type: 'error' });
+    callbackHandler.endGameCallback = emptyFunction;
+  });
+};
+
+const onNotifEndGame = (socket: Socket): void => {
+  socket.on(NOTIF_END_GAME, () => {
+    store.dispatch(endGameDux());
+  });
+};
+
 export const initalizeSocketForGame = (socket: Socket): void => {
   createdGame(socket);
   errorCreateGame(socket);
@@ -251,4 +288,7 @@ export const initalizeSocketForGame = (socket: Socket): void => {
   startedGame(socket);
   onErrorStartGame(socket);
   onNotifStartGame(socket);
+  endedGame(socket);
+  onErrorEndGame(socket);
+  onNotifEndGame(socket);
 };

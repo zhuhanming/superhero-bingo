@@ -11,6 +11,10 @@ class CallbackHandler {
   fetchGameUserTokenCallback = emptyFunction;
 
   leaveGameCallback = emptyFunction;
+
+  signInviteCallback = emptyFunction;
+
+  endGameCallback = emptyFunction;
 }
 
 export const callbackHandler = new CallbackHandler();

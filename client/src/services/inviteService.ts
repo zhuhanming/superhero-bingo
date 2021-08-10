@@ -19,6 +19,7 @@ import {
   trySignInvitation,
   updateSuperheroScore,
 } from 'reducers/gameDux';
+import { callbackHandler, emptyFunction } from 'utils/callbackHandler';
 
 export const fetchInvite = (
   socket: Socket,
@@ -56,6 +57,8 @@ const signedInvite = (socket: Socket): void => {
       toast(`Successfully signed for ${payload.signee.name}!`, {
         type: 'success',
       });
+      callbackHandler.signInviteCallback();
+      callbackHandler.signInviteCallback = emptyFunction;
     }
   );
 };
