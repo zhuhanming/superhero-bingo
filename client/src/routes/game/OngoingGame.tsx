@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import BingoButton from 'components/bingoButton';
 import Leaderboard from 'components/leaderboard';
+import SuperpowerGrid from 'components/superpowerGrid';
 import { useSocket } from 'contexts/SocketContext';
 import { updateLoadingState } from 'reducers/miscDux';
 import { RootState } from 'reducers/rootReducer';
@@ -14,41 +15,66 @@ const OngoingGame: React.FC = () => {
   const isEndingGame = useSelector(
     (state: RootState) => state.misc.loading.isEndingGame
   );
+  const superheroIdToInvites = useSelector(
+    (state: RootState) => state.owner.superheroIdToInvites
+  );
   const dispatch = useDispatch();
   const { socket } = useSocket();
+  const [selectedHeroId, setSelectedHeroId] = useState<number | undefined>(
+    undefined
+  );
 
   const onClickEndGame = () => {
     dispatch(updateLoadingState({ isEndingGame: true }));
     endGame(socket, game.id, bingo.ownerCode);
   };
 
+  const onClickLeaderboard = (id: number) => {
+    if (id === selectedHeroId) {
+      setSelectedHeroId(undefined);
+    } else {
+      setSelectedHeroId(id);
+    }
+  };
+
   return (
     <main className="flex pt-8" style={{ height: 'calc(100vh - 3rem)' }}>
       <div className="hidden md:block mr-8" style={{ flex: 3 }}>
-        <h1 className="font-bold text-2xl mb-4">How to Play</h1>
-        <p className="text-xl font-regular mb-4">
-          You should see a grid of {bingo.superpowers.length}{' '}
-          {bingo.superpowers.length === 1 ? 'superpower ' : 'superpowers'} in
-          front of you.
-        </p>
-        <p className="text-xl font-regular mb-4">
-          Your goal is to find{' '}
-          <strong>{bingo.superpowers.length} unique</strong>{' '}
-          {bingo.superpowers.length === 1 ? 'superhero' : 'superheroes'} to sign
-          against the superpowers that they possess.
-        </p>
-        <p className="text-xl font-regular mb-4">
-          To do so, simply click on the square you want to get signed to copy an
-          invite code, and send the code to that superhero.
-        </p>
-        <p className="text-xl font-regular mb-4">
-          To sign, simply click the Sign tab on the top right hand corner, paste
-          the invite code that you have received from fellow superheroes into
-          the field there, and click &quot;Sign&quot;!
-        </p>
-        <p className="text-xl font-regular mb-4">
-          The first superhero to get all superpowers signed wins!
-        </p>
+        {selectedHeroId == null ? (
+          <>
+            <h1 className="font-bold text-2xl mb-4">How to Play</h1>
+            <p className="text-xl font-regular mb-4">
+              You should see a grid of {bingo.superpowers.length}{' '}
+              {bingo.superpowers.length === 1 ? 'superpower ' : 'superpowers'}{' '}
+              in front of you.
+            </p>
+            <p className="text-xl font-regular mb-4">
+              Your goal is to find{' '}
+              <strong>{bingo.superpowers.length} unique</strong>{' '}
+              {bingo.superpowers.length === 1 ? 'superhero' : 'superheroes'} to
+              sign against the superpowers that they possess.
+            </p>
+            <p className="text-xl font-regular mb-4">
+              To do so, simply click on the square you want to get signed to
+              copy an invite code, and send the code to that superhero.
+            </p>
+            <p className="text-xl font-regular mb-4">
+              To sign, simply click the Sign tab on the top right hand corner,
+              paste the invite code that you have received from fellow
+              superheroes into the field there, and click &quot;Sign&quot;!
+            </p>
+            <p className="text-xl font-regular mb-4">
+              The first superhero to get all superpowers signed wins!
+            </p>
+          </>
+        ) : (
+          <SuperpowerGrid
+            superpowers={bingo.superpowers}
+            isEdit={false}
+            invites={superheroIdToInvites[selectedHeroId] ?? []}
+            className="pr-20"
+          />
+        )}
       </div>
       <div className="flex flex-col" style={{ flex: 2 }}>
         <h1 className="font-bold text-2xl mb-4">Leaderboard</h1>
@@ -57,6 +83,8 @@ const OngoingGame: React.FC = () => {
           leaderboard={leaderboard}
           numSuperpowers={bingo.superpowers.length}
           className="flex-1 overflow-scroll"
+          onClick={onClickLeaderboard}
+          selectedId={selectedHeroId}
         />
         <BingoButton
           text="End Game"

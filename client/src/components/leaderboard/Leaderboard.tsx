@@ -7,6 +7,8 @@ type Props = {
   leaderboard: LeaderboardType;
   numSuperpowers: number;
   className?: string;
+  onClick?: (id: number) => void;
+  selectedId?: number;
 };
 
 const Leaderboard: React.FC<Props> = ({
@@ -14,6 +16,8 @@ const Leaderboard: React.FC<Props> = ({
   leaderboard,
   numSuperpowers,
   className = '',
+  onClick,
+  selectedId,
 }) => {
   const superheroesWithScore = superheroes
     .map((s) => ({ ...s, score: leaderboard[s.id] ?? 0 }))
@@ -35,9 +39,17 @@ const Leaderboard: React.FC<Props> = ({
       {transitions((style, item, t, index) => (
         <animated.div
           className={`flex justify-between items-center ${
-            item.score === numSuperpowers ? 'bg-green' : 'bg-gray'
-          } mb-2 p-4 rounded-lg border-black border-4`}
+            // eslint-disable-next-line no-nested-ternary
+            selectedId === item.id
+              ? 'bg-blue'
+              : item.score === numSuperpowers
+              ? 'bg-green'
+              : 'bg-gray'
+          } mb-2 p-4 rounded-lg border-black border-4 ${
+            onClick != null ? 'cursor-pointer' : ''
+          }`}
           style={{ zIndex: superheroes.length - index, ...style }}
+          onClick={onClick != null ? () => onClick(item.id) : undefined}
         >
           <div className="font-medium text-xl">{item.name}</div>
           <div className="font-regular">
