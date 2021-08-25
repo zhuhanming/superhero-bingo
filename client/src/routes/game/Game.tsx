@@ -142,7 +142,7 @@ const Game: React.FC = () => {
         </div>
         <BingoButton
           text="Start Game!"
-          isDisabled={game.heroes.length < superpowers.length + 1}
+          isDisabled={game.heroes.length < 2}
           isLoading={isStartingGame}
           onClick={onStartGame}
           className="md:max-w-2xl p-4 bg-blue border-black border-8 mt-4"
