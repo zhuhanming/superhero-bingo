@@ -25,9 +25,7 @@ const Game: React.FC = () => {
   const isStartingGame = useSelector(
     (state: RootState) => state.misc.loading.isStartingGame
   );
-  const { superpowers, ownerCode } = useSelector(
-    (state: RootState) => state.bingo.bingo
-  );
+  const { ownerCode } = useSelector((state: RootState) => state.bingo.bingo);
   const dispatch = useDispatch();
   const { socket } = useSocket();
 
